@@ -617,7 +617,7 @@ export default function App() {
       dismissToast();
       navigateToCheckout();
     } else {
-      showTimedToast({ kind: 'added', productTitle: product.title }, 4000);
+      showTimedToast({ kind: 'added', productTitle: product.title }, 2000);
     }
   };
 
@@ -673,50 +673,43 @@ export default function App() {
   );
 
   const GlobalToastBanner = toast ? (
-    <div
-      role="status"
-      aria-live="polite"
-      className={`fixed z-[60] ${
-        activeOverlay === 'cart'
-          ? cartItems.length > 0
-            ? 'bottom-[178px] left-4 right-4 sm:left-auto sm:right-6 sm:w-[372px]'
-            : 'bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-[372px]'
-          : isCheckoutRoute
-          ? 'bottom-[86px] left-1/2 -translate-x-1/2 w-[calc(100vw-32px)] max-w-[380px]'
-          : activeProduct
-          ? 'bottom-[84px] left-4 right-[76px] sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-auto sm:max-w-[420px]'
-          : 'bottom-4 left-4 right-[76px] sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-auto sm:max-w-[420px]'
-      } bg-[#321004] text-white border border-[#c8a078] shadow-xl px-4 py-2.5 flex items-center justify-between gap-3`}
-    >
-      <span className="text-[12px] font-medium tracking-[0.4px] leading-snug min-w-0">
-        {toast.kind === 'added'
-          ? 'Bag me add ho gaya'
-          : 'Item hata diya'}
-      </span>
-
-      <div className="flex items-center gap-2 shrink-0">
-        {toast.kind === 'added' ? (
-          <button
-            type="button"
-            onClick={() => {
-              dismissToast();
-              openOverlay('cart');
-            }}
-            className="min-h-[36px] px-3 bg-[#d74a5d] hover:bg-[#b8384a] text-white text-[11px] font-semibold uppercase tracking-[1px] cursor-pointer whitespace-nowrap"
-          >
-            VIEW BAG
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleUndoRemove}
-            className="min-h-[36px] px-3 bg-[#dcb48c] hover:bg-white text-[#321004] text-[11px] font-semibold uppercase tracking-[1px] cursor-pointer whitespace-nowrap"
-          >
-            UNDO
-          </button>
-        )}
+    toast.kind === 'added' ? (
+      <div
+        role="status"
+        aria-live="polite"
+        className="fixed bottom-[90px] left-1/2 -translate-x-1/2 z-[45] max-w-[220px] px-4 py-2 bg-[#321004] text-white border border-[#c8a078] shadow-md text-[14px] font-medium leading-tight whitespace-nowrap text-center pointer-events-none"
+      >
+        Added to bag
       </div>
-    </div>
+    ) : (
+      <div
+        role="status"
+        aria-live="polite"
+        className={`fixed z-[60] ${
+          activeOverlay === 'cart'
+            ? cartItems.length > 0
+              ? 'bottom-[178px] left-4 right-4 sm:left-auto sm:right-6 sm:w-[372px]'
+              : 'bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-[372px]'
+            : isCheckoutRoute
+            ? 'bottom-[86px] left-1/2 -translate-x-1/2 w-[calc(100vw-32px)] max-w-[380px]'
+            : activeProduct
+            ? 'bottom-[90px] left-4 right-[76px] sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-auto sm:max-w-[360px]'
+            : 'bottom-4 left-4 right-[76px] sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-auto sm:max-w-[360px]'
+        } bg-[#321004] text-white border border-[#c8a078] shadow-xl px-4 py-2.5 flex items-center justify-between gap-3`}
+      >
+        <span className="text-[12px] font-medium tracking-[0.4px] leading-snug min-w-0">
+          Item hata diya
+        </span>
+
+        <button
+          type="button"
+          onClick={handleUndoRemove}
+          className="min-h-[36px] px-3 bg-[#dcb48c] hover:bg-white text-[#321004] text-[11px] font-semibold uppercase tracking-[1px] cursor-pointer whitespace-nowrap shrink-0"
+        >
+          UNDO
+        </button>
+      </div>
+    )
   ) : null;
 
   // Full-page Checkout Route
@@ -787,6 +780,7 @@ export default function App() {
           <div key={`pdp-${activeProduct.id}`} className="aaroha-page-enter">
             <ProductDetailPage
               product={activeProduct}
+              cartItems={cartItems}
               cartCount={cartCount}
               zoomOpen={activeOverlay === 'zoom'}
               onBack={handleAppBack}

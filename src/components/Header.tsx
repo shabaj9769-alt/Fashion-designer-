@@ -148,11 +148,11 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               onClick={onOpenCart}
               aria-label={`Shopping bag with ${cartCount} items`}
-              className="relative p-2 text-[#000000] hover:text-[#d74a5d] transition-colors min-w-[40px] min-h-[44px] flex items-center justify-center"
+              className="relative w-11 h-11 text-[#000000] hover:text-[#d74a5d] transition-colors flex items-center justify-center overflow-visible"
             >
               <ShoppingBag className="w-[19px] h-[19px] stroke-[1.6]" />
               {cartCount > 0 && (
-                <span className="absolute top-1.5 right-0.5 min-w-[17px] h-[17px] px-1 bg-[#d74a5d] text-white text-[10px] font-semibold flex items-center justify-center tabular-nums leading-none">
+                <span className="absolute top-[6px] right-[5px] min-w-[17px] h-[17px] px-1 rounded-full bg-[#d74a5d] text-white text-[10px] font-semibold flex items-center justify-center tabular-nums leading-none">
                   {cartCount}
                 </span>
               )}

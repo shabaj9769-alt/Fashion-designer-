@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
   ArrowLeft,
-  Check,
   ChevronLeft,
   ChevronRight,
   Heart,
@@ -22,12 +21,13 @@ import {
   ZoomIn,
 } from 'lucide-react';
 import { PRODUCTS } from '../data/catalog';
-import { Product, SizeOption } from '../types/store';
+import { CartItem, Product, SizeOption } from '../types/store';
 import { formatINR, getDiscountPercent } from '../utils/currency';
 import { SmartImage } from './SmartImage';
 
 interface ProductDetailPageProps {
   product: Product;
+  cartItems: CartItem[];
   cartCount: number;
   zoomOpen: boolean;
   onBack: () => void;
@@ -57,6 +57,7 @@ function getProductRatingStats(productId: string) {
 
 export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   product,
+  cartItems,
   cartCount,
   zoomOpen,
   onBack,
@@ -72,7 +73,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [quantity, setQuantity] = useState(1);
   const [customNote, setCustomNote] = useState('');
   const [activeImageIdx, setActiveImageIdx] = useState(0);
-  const [addedFeedback, setAddedFeedback] = useState(false);
   const [shakeSizes, setShakeSizes] = useState(false);
   const [sizeToast, setSizeToast] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
@@ -94,7 +94,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     setQuantity(1);
     setCustomNote('');
     setActiveImageIdx(0);
-    setAddedFeedback(false);
     setShakeSizes(false);
     setSizeToast(false);
     setPincodeResult(null);
@@ -222,6 +221,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     setSizeToast(false);
   };
 
+  const isSelectedSizeInBag = useMemo(() => {
+    if (!selectedSize) return false;
+    const cleanNote =
+      selectedSize === 'Custom' ? customNote.trim() || undefined : undefined;
+    const targetKey = `${product.id}__${selectedSize}__${cleanNote ?? ''}`;
+    return cartItems.some((item) => item.key === targetKey);
+  }, [cartItems, product.id, selectedSize, customNote]);
+
   const handleAddToBag = (openCheckout = false) => {
     if (!selectedSize) {
       triggerSizePrompt();
@@ -234,10 +241,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       selectedSize === 'Custom' ? customNote.trim() || undefined : undefined,
       openCheckout
     );
-    if (!openCheckout) {
-      setAddedFeedback(true);
-      setTimeout(() => setAddedFeedback(false), 1800);
-    }
   };
 
   const handleCheckPincode = (e: React.FormEvent) => {
@@ -271,37 +274,39 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   return (
     <div className="bg-white pb-[100px]">
-      {/* Compact Sticky Top Bar: Back Arrow (44x44) + 1-line Product Name + Cart Icon */}
-      <header className="aaroha-sticky-topbar bg-white border-b border-[#e8e8e8]">
-        <div className="max-w-[1440px] mx-auto px-2 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-2">
-          <button
-            type="button"
-            onClick={onBack}
-            aria-label="Go back"
-            className="w-11 h-11 shrink-0 bg-white text-[#321004] hover:text-[#d74a5d] flex items-center justify-center transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
+      {/* Compact Sticky Top Bar (hidden while fullscreen Zoom Viewer is open so only one header shows) */}
+      {!zoomOpen && (
+        <header className="aaroha-sticky-topbar bg-white border-b border-[#e8e8e8]">
+          <div className="max-w-[1440px] mx-auto px-2 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={onBack}
+              aria-label="Go back"
+              className="w-11 h-11 shrink-0 bg-white text-[#321004] hover:text-[#d74a5d] flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
 
-          <p className="flex-1 min-w-0 text-center text-[13px] sm:text-[14px] font-medium uppercase tracking-[1px] text-[#000000] truncate px-2">
-            {product.title}
-          </p>
+            <p className="flex-1 min-w-0 text-center text-[13px] sm:text-[14px] font-medium uppercase tracking-[1px] text-[#000000] truncate px-2">
+              {product.title}
+            </p>
 
-          <button
-            type="button"
-            onClick={onOpenCart}
-            aria-label={`Shopping bag with ${cartCount} items`}
-            className="relative w-11 h-11 shrink-0 bg-white text-[#321004] hover:text-[#d74a5d] flex items-center justify-center transition-colors cursor-pointer"
-          >
-            <ShoppingBag className="w-[19px] h-[19px] stroke-[1.7]" />
-            {cartCount > 0 && (
-              <span className="absolute top-1.5 right-1 min-w-[17px] h-[17px] px-1 bg-[#d74a5d] text-white text-[10px] font-semibold flex items-center justify-center tabular-nums leading-none">
-                {cartCount}
-              </span>
-            )}
-          </button>
-        </div>
-      </header>
+            <button
+              type="button"
+              onClick={onOpenCart}
+              aria-label={`Shopping bag with ${cartCount} items`}
+              className="relative w-11 h-11 shrink-0 bg-white text-[#321004] hover:text-[#d74a5d] flex items-center justify-center transition-colors cursor-pointer overflow-visible"
+            >
+              <ShoppingBag className="w-[19px] h-[19px] stroke-[1.7]" />
+              {cartCount > 0 && (
+                <span className="absolute top-[6px] right-[5px] min-w-[17px] h-[17px] px-1 rounded-full bg-[#d74a5d] text-white text-[10px] font-semibold flex items-center justify-center tabular-nums leading-none">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
+        </header>
+      )}
 
       {/* Main 2-Column E-Commerce PDP Layout */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-10 pt-5 sm:pt-8">
@@ -978,13 +983,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       {/* Fullscreen Viewer Overlay */}
       {zoomOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-[#0d0a09] flex flex-col items-center justify-between pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] px-4"
           role="dialog"
           aria-modal="true"
           aria-label={`Expanded view of ${product.title}`}
         >
-          <div className="w-full max-w-[960px] flex items-center justify-between pb-3 text-white">
-            <p className="text-[12px] uppercase tracking-[1px] truncate pr-4">
+          <div className="shrink-0 w-full max-w-[960px] h-14 flex items-center justify-between gap-3 text-white">
+            <p className="text-[12px] sm:text-[13px] uppercase tracking-[1px] truncate min-w-0">
               {product.title} · {activeImageIdx + 1}/{gallerySlides.length}
             </p>
             <button
@@ -997,57 +1002,59 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             </button>
           </div>
 
-          <div
-            className="relative w-full max-w-[640px] max-h-[75dvh] aspect-[3/4] bg-[#f2f2f2] overflow-hidden touch-pan-y"
-            onTouchStart={handleGalleryTouchStart}
-            onTouchEnd={handleGalleryTouchEnd}
-          >
-            <SmartImage
-              src={gallerySlides[activeImageIdx].src}
-              alt={`${product.title} expanded`}
-              width={1200}
-              height={1600}
-              aspectRatio="3 / 4"
-              className="w-full h-full object-contain"
-              fallbackBg={gallerySlides[activeImageIdx].shade}
-            />
+          <div className="flex-1 min-h-0 w-full flex items-center justify-center py-2">
+            <div
+              className="relative w-[min(100%,540px,calc((100dvh-140px)*0.75))] aspect-[3/4] bg-[#f2f2f2] overflow-hidden touch-pan-y"
+              onTouchStart={handleGalleryTouchStart}
+              onTouchEnd={handleGalleryTouchEnd}
+            >
+              <SmartImage
+                src={gallerySlides[activeImageIdx].src}
+                alt={`${product.title} expanded`}
+                width={1200}
+                height={1600}
+                aspectRatio="3 / 4"
+                className="w-full h-full object-contain"
+                fallbackBg={gallerySlides[activeImageIdx].shade}
+              />
 
-            <button
-              type="button"
-              onClick={() =>
-                setActiveImageIdx(
-                  (prev) =>
-                    (prev - 1 + gallerySlides.length) % gallerySlides.length
-                )
-              }
-              aria-label="Previous slide"
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 text-[#321004] flex items-center justify-center cursor-pointer"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                setActiveImageIdx((prev) => (prev + 1) % gallerySlides.length)
-              }
-              aria-label="Next slide"
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 text-[#321004] flex items-center justify-center cursor-pointer"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setActiveImageIdx(
+                    (prev) =>
+                      (prev - 1 + gallerySlides.length) % gallerySlides.length
+                  )
+                }
+                aria-label="Previous slide"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 text-[#321004] flex items-center justify-center cursor-pointer"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setActiveImageIdx((prev) => (prev + 1) % gallerySlides.length)
+                }
+                aria-label="Next slide"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 text-[#321004] flex items-center justify-center cursor-pointer"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center justify-center gap-2 mt-4">
+          <div className="shrink-0 py-4 flex items-center justify-center gap-2.5">
             {gallerySlides.map((_, idx) => (
               <button
                 key={idx}
                 type="button"
                 aria-label={`Zoom slide ${idx + 1} of ${gallerySlides.length}`}
                 onClick={() => setActiveImageIdx(idx)}
-                className={`h-2 rounded-full transition-all duration-200 cursor-pointer ${
+                className={`h-2.5 rounded-full transition-all duration-200 cursor-pointer ${
                   activeImageIdx === idx
-                    ? 'w-6 bg-white'
-                    : 'w-2 bg-white/40 hover:bg-white/75'
+                    ? 'w-7 bg-white'
+                    : 'w-2.5 bg-white/40 hover:bg-white/75'
                 }`}
               />
             ))}
@@ -1055,52 +1062,57 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         </div>
       )}
 
-      {/* Single Sticky Bottom Purchase Bar (Mobile & Desktop) */}
-      <div className="fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[#e8e8e8] shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
-        <div className="max-w-[1440px] mx-auto px-3 sm:px-8 lg:px-10 py-3 flex items-center justify-between gap-3 sm:gap-6">
-          {/* Left: Price + % OFF */}
-          <div className="shrink-0 tabular-nums flex flex-col sm:flex-row sm:items-baseline sm:gap-2.5">
-            <span className="text-[16px] sm:text-[20px] font-semibold text-[#000000] leading-tight">
-              {formatINR(product.salePrice * quantity)}
-            </span>
-            {product.onSale && product.price > product.salePrice && (
-              <div className="flex items-baseline gap-1.5">
-                <span className="hidden sm:inline text-[13px] text-[#777777] line-through">
-                  {formatINR(product.price * quantity)}
-                </span>
-                <span className="text-[11px] sm:text-[13px] font-semibold text-[#15803d] leading-tight">
-                  {discountPct}% OFF
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Right: Single ADD TO BAG & BUY NOW buttons */}
-          <div className="flex-1 sm:flex-none sm:w-[420px] flex items-stretch gap-2 sm:gap-3">
-            <button
-              type="button"
-              onClick={() => handleAddToBag(false)}
-              className="flex-1 min-h-[46px] px-3 sm:px-5 bg-[#d74a5d] hover:bg-[#321004] text-white text-[11px] sm:text-[12px] font-medium uppercase tracking-[1.2px] sm:tracking-[1.5px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-            >
-              {addedFeedback ? (
-                <>
-                  <Check className="w-4 h-4" />
-                  <span>ADDED TO BAG</span>
-                </>
-              ) : (
-                <span>ADD TO BAG</span>
+      {/* Single Sticky Bottom Purchase Bar (hidden when zoom viewer is open) */}
+      {!zoomOpen && (
+        <div className="fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[#e8e8e8] shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+          <div className="max-w-[1440px] mx-auto px-3 sm:px-8 lg:px-10 py-3 flex items-center justify-between gap-2.5 sm:gap-6">
+            {/* Left: Compact Price + % OFF */}
+            <div className="shrink-0 tabular-nums flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
+              <span className="text-[17px] font-semibold text-[#000000] leading-tight whitespace-nowrap">
+                {formatINR(product.salePrice * quantity)}
+              </span>
+              {product.onSale && product.price > product.salePrice && (
+                <div className="flex items-baseline gap-1.5">
+                  <span className="hidden sm:inline text-[12px] text-[#777777] line-through">
+                    {formatINR(product.price * quantity)}
+                  </span>
+                  <span className="text-[11px] font-semibold text-[#15803d] leading-tight whitespace-nowrap">
+                    {discountPct}% OFF
+                  </span>
+                </div>
               )}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAddToBag(true)}
-              className="flex-1 min-h-[46px] px-3 sm:px-5 bg-[#321004] hover:bg-[#000000] text-white text-[11px] sm:text-[12px] font-medium uppercase tracking-[1.2px] sm:tracking-[1.5px] flex items-center justify-center transition-colors cursor-pointer"
-            >
-              BUY NOW
-            </button>
+            </div>
+
+            {/* Right: Equal-width Single-line Action Buttons */}
+            <div className="flex-1 min-w-0 sm:flex-none sm:w-[340px] flex items-stretch gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  isSelectedSizeInBag ? onOpenCart() : handleAddToBag(false)
+                }
+                className={`flex-1 min-w-0 min-h-[46px] px-[8px] text-white text-[12px] font-medium uppercase tracking-[0.8px] whitespace-nowrap flex items-center justify-center transition-colors cursor-pointer ${
+                  isSelectedSizeInBag
+                    ? 'bg-[#321004] hover:bg-[#000000]'
+                    : 'bg-[#d74a5d] hover:bg-[#321004]'
+                }`}
+              >
+                {isSelectedSizeInBag ? 'GO TO BAG' : 'ADD TO BAG'}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAddToBag(true)}
+                className={`flex-1 min-w-0 min-h-[46px] px-[8px] text-white text-[12px] font-medium uppercase tracking-[0.8px] whitespace-nowrap flex items-center justify-center transition-colors cursor-pointer ${
+                  isSelectedSizeInBag
+                    ? 'bg-[#000000] hover:bg-[#321004]'
+                    : 'bg-[#321004] hover:bg-[#000000]'
+                }`}
+              >
+                BUY NOW
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
