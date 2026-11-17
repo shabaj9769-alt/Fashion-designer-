@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
-import { HERO_SLIDES } from '../data/catalog';
+import { useStoreData } from '../context/StoreDataContext';
 import { SmartImage } from './SmartImage';
 
 interface HeroSlideshowProps {
@@ -10,23 +10,33 @@ interface HeroSlideshowProps {
 export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
   onExploreFilter,
 }) => {
+  const { heroSlides } = useStoreData();
   const [current, setCurrent] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
 
   useEffect(() => {
-    if (!isPlaying) return;
+    if (current >= heroSlides.length && heroSlides.length > 0) {
+      setCurrent(0);
+    }
+  }, [current, heroSlides.length]);
+
+  useEffect(() => {
+    if (!isPlaying || heroSlides.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % HERO_SLIDES.length);
+      setCurrent((prev) => (prev + 1) % heroSlides.length);
     }, 5500);
     return () => clearInterval(timer);
-  }, [isPlaying]);
+  }, [isPlaying, heroSlides.length]);
+
+  if (heroSlides.length === 0) return null;
+
+  const safeIndex = current < heroSlides.length ? current : 0;
+  const activeSlide = heroSlides[safeIndex];
 
   const goPrev = () =>
-    setCurrent((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    setCurrent((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   const goNext = () =>
-    setCurrent((prev) => (prev + 1) % HERO_SLIDES.length);
-
-  const activeSlide = HERO_SLIDES[current];
+    setCurrent((prev) => (prev + 1) % heroSlides.length);
 
   return (
     <section
@@ -50,7 +60,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
         <div className="block sm:hidden w-full h-full">
           <SmartImage
             key={`${activeSlide.id}-mobile`}
-            src={activeSlide.mobileImage}
+            src={activeSlide.mobileImage || activeSlide.desktopImage}
             alt={activeSlide.title}
             width={800}
             height={1067}
@@ -70,22 +80,26 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
       />
 
       {/* Desktop Prev / Next Arrows */}
-      <button
-        type="button"
-        onClick={goPrev}
-        aria-label="Previous slide"
-        className="hidden lg:flex absolute left-4 top-1/2 -translate-y-1/2 z-[3] w-11 h-11 bg-white/85 hover:bg-white text-[#000000] items-center justify-center transition-colors cursor-pointer"
-      >
-        <ChevronLeft className="w-5 h-5" />
-      </button>
-      <button
-        type="button"
-        onClick={goNext}
-        aria-label="Next slide"
-        className="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 z-[3] w-11 h-11 bg-white/85 hover:bg-white text-[#000000] items-center justify-center transition-colors cursor-pointer"
-      >
-        <ChevronRight className="w-5 h-5" />
-      </button>
+      {heroSlides.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={goPrev}
+            aria-label="Previous slide"
+            className="hidden lg:flex absolute left-4 top-1/2 -translate-y-1/2 z-[3] w-11 h-11 bg-white/85 hover:bg-white text-[#000000] items-center justify-center transition-colors cursor-pointer"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={goNext}
+            aria-label="Next slide"
+            className="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 z-[3] w-11 h-11 bg-white/85 hover:bg-white text-[#000000] items-center justify-center transition-colors cursor-pointer"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </>
+      )}
 
       {/* Single Normal-Flow Text & Controls Container: z-index 2, bottom padding 24px */}
       <div className="relative z-[2] w-full max-w-[1440px] mx-auto px-5 sm:px-10 lg:px-14 pt-20 pb-[24px] flex flex-col gap-6">
@@ -111,38 +125,41 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
         </div>
 
         {/* Dots + Pause/Play Controls in Bottom-LEFT */}
-        <div className="flex items-center justify-start gap-3">
-          <div className="flex items-center gap-2.5">
-            {HERO_SLIDES.map((s, idx) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setCurrent(idx)}
-                aria-label={`Go to slide ${idx + 1}`}
-                aria-current={idx === current ? 'true' : undefined}
-                className={`h-2 transition-all duration-200 cursor-pointer ${
-                  idx === current
-                    ? 'w-7 bg-white'
-                    : 'w-2 bg-white/50 hover:bg-white/80'
-                }`}
-              />
-            ))}
-          </div>
+        {heroSlides.length > 1 && (
+          <div className="flex items-center justify-start gap-3">
+            <div className="flex items-center gap-2.5">
+              {heroSlides.map((s, idx) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setCurrent(idx)}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  aria-current={idx === safeIndex ? 'true' : undefined}
+                  className={`h-2 transition-all duration-200 cursor-pointer ${
+                    idx === safeIndex
+                      ? 'w-7 bg-white'
+                      : 'w-2 bg-white/50 hover:bg-white/80'
+                  }`}
+                />
+              ))}
+            </div>
 
-          <button
-            type="button"
-            onClick={() => setIsPlaying((p) => !p)}
-            aria-label={isPlaying ? 'Pause slideshow' : 'Play slideshow'}
-            className="w-11 h-11 bg-black/45 hover:bg-black/70 text-white border border-white/30 flex items-center justify-center transition-colors cursor-pointer"
-          >
-            {isPlaying ? (
-              <Pause className="w-3.5 h-3.5" />
-            ) : (
-              <Play className="w-3.5 h-3.5 ml-0.5" />
-            )}
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => setIsPlaying((p) => !p)}
+              aria-label={isPlaying ? 'Pause slideshow' : 'Play slideshow'}
+              className="w-11 h-11 bg-black/45 hover:bg-black/70 text-white border border-white/30 flex items-center justify-center transition-colors cursor-pointer"
+            >
+              {isPlaying ? (
+                <Pause className="w-3.5 h-3.5" />
+              ) : (
+                <Play className="w-3.5 h-3.5 ml-0.5" />
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
 };
+

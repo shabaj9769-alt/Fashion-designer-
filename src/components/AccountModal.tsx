@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PackageCheck, User, X } from 'lucide-react';
+import { useStoreData } from '../context/StoreDataContext';
 
 interface AccountModalProps {
   open: boolean;
@@ -7,6 +8,7 @@ interface AccountModalProps {
 }
 
 export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => {
+  const { orders, settings } = useStoreData();
   const [tab, setTab] = useState<'signin' | 'track'>('signin');
   const [email, setEmail] = useState('');
   const [orderId, setOrderId] = useState('');
@@ -24,9 +26,19 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
       setEmail('');
     } else {
       if (!orderId.trim()) return;
-      setStatusMessage(
-        `Order ${orderId.trim().toUpperCase()} is currently in tailoring quality check at our Jaipur atelier.`
+      const cleanId = orderId.trim().toUpperCase();
+      const matchedOrder = orders.find(
+        (o) => o.orderId.toUpperCase() === cleanId
       );
+      if (matchedOrder) {
+        setStatusMessage(
+          `Order ${matchedOrder.orderId} (${matchedOrder.placedAt}): Current status is "${matchedOrder.status ?? 'Placed'}".`
+        );
+      } else {
+        setStatusMessage(
+          `Order ${cleanId} is currently in tailoring quality check at our ${settings.storeName} atelier.`
+        );
+      }
     }
   };
 

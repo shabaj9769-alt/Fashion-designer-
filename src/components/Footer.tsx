@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { Check, Instagram, Mail, MapPin, Phone } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Check, Facebook, Instagram, Mail, MapPin, Phone } from 'lucide-react';
+import { useStoreData } from '../context/StoreDataContext';
 
 interface FooterProps {
   onSelectFilter: (filterKey: string) => void;
   onOpenCustomGuide: (topic: 'Made to Order' | 'Custom Sizing') => void;
   onOpenAccount: () => void;
+  onSecretAdminOpen?: () => void;
 }
 
 const SHOP_LINKS = [
@@ -22,9 +24,33 @@ export const Footer: React.FC<FooterProps> = ({
   onSelectFilter,
   onOpenCustomGuide,
   onOpenAccount,
+  onSecretAdminOpen,
 }) => {
+  const { settings } = useStoreData();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+
+  const tapCountRef = useRef(0);
+  const tapTimerRef = useRef<number | null>(null);
+
+  const handleCopyrightTap = () => {
+    tapCountRef.current += 1;
+    if (tapTimerRef.current) {
+      window.clearTimeout(tapTimerRef.current);
+    }
+    if (tapCountRef.current >= 5) {
+      tapCountRef.current = 0;
+      if (onSecretAdminOpen) {
+        onSecretAdminOpen();
+      } else {
+        window.location.hash = '#/admin';
+      }
+      return;
+    }
+    tapTimerRef.current = window.setTimeout(() => {
+      tapCountRef.current = 0;
+    }, 2200);
+  };
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,11 +66,10 @@ export const Footer: React.FC<FooterProps> = ({
           {/* Column 1: About + Newsletter */}
           <div>
             <p className="text-[18px] font-medium uppercase tracking-[3.5px] text-white mb-4">
-              AAROHA
+              {settings.storeName || 'AAROHA'}
             </p>
             <p className="text-[13px] text-white/80 leading-[1.75] max-w-md mb-6">
-              Modern Indian ethnic wear shaped by regional handlooms, natural fibers,
-              and thoughtful made-to-order tailoring from our Jaipur atelier.
+              {settings.footerText}
             </p>
 
             <p className="text-[11px] font-medium uppercase tracking-[1.2px] text-[#dcb48c] mb-2.5">
@@ -53,7 +78,10 @@ export const Footer: React.FC<FooterProps> = ({
             {subscribed ? (
               <div className="flex items-center gap-2 py-2.5 px-3.5 bg-white/10 border border-[#c8a078]/60 text-[12px] text-white">
                 <Check className="w-4 h-4 text-[#dcb48c] shrink-0" />
-                <span>Thank you for joining the Aaroha journal.</span>
+                <span>
+                  Thank you for joining the {settings.storeName || 'Aaroha'}{' '}
+                  journal.
+                </span>
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex max-w-sm">
@@ -150,50 +178,77 @@ export const Footer: React.FC<FooterProps> = ({
               CONTACT ATELIER
             </h3>
             <ul className="space-y-3 text-[13px] text-white/80">
-              <li className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-[#c8a078] shrink-0 mt-0.5" />
-                <span>14 Johari Courtyard, C-Scheme, Jaipur 302001</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-[#c8a078] shrink-0" />
-                <a
-                  href="mailto:care@aarohaatelier.com"
-                  className="hover:text-white transition-colors"
-                >
-                  care@aarohaatelier.com
-                </a>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-[#c8a078] shrink-0" />
-                <span>+91 98200 41290 (Mon–Sat, 10 AM – 7 PM IST)</span>
-              </li>
+              {settings.address && (
+                <li className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-[#c8a078] shrink-0 mt-0.5" />
+                  <span>{settings.address}</span>
+                </li>
+              )}
+              {settings.email && (
+                <li className="flex items-center gap-2.5">
+                  <Mail className="w-4 h-4 text-[#c8a078] shrink-0" />
+                  <a
+                    href={`mailto:${settings.email}`}
+                    className="hover:text-white transition-colors"
+                  >
+                    {settings.email}
+                  </a>
+                </li>
+              )}
+              {settings.phone && (
+                <li className="flex items-center gap-2.5">
+                  <Phone className="w-4 h-4 text-[#c8a078] shrink-0" />
+                  <span>{settings.phone}</span>
+                </li>
+              )}
             </ul>
 
             <div className="flex items-center gap-3 mt-5">
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Aaroha on Instagram"
-                className="w-9 h-9 border border-white/25 hover:border-[#dcb48c] flex items-center justify-center text-white/85 hover:text-[#dcb48c] transition-colors"
-              >
-                <Instagram className="w-4 h-4" />
-              </a>
-              <a
-                href="mailto:care@aarohaatelier.com"
-                aria-label="Email Aaroha"
-                className="w-9 h-9 border border-white/25 hover:border-[#dcb48c] flex items-center justify-center text-white/85 hover:text-[#dcb48c] transition-colors"
-              >
-                <Mail className="w-4 h-4" />
-              </a>
+              {settings.instagramUrl && (
+                <a
+                  href={settings.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-9 h-9 border border-white/25 hover:border-[#dcb48c] flex items-center justify-center text-white/85 hover:text-[#dcb48c] transition-colors"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+              )}
+              {settings.facebookUrl && (
+                <a
+                  href={settings.facebookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-9 h-9 border border-white/25 hover:border-[#dcb48c] flex items-center justify-center text-white/85 hover:text-[#dcb48c] transition-colors"
+                >
+                  <Facebook className="w-4 h-4" />
+                </a>
+              )}
+              {settings.email && (
+                <a
+                  href={`mailto:${settings.email}`}
+                  aria-label="Email Atelier"
+                  className="w-9 h-9 border border-white/25 hover:border-[#dcb48c] flex items-center justify-center text-white/85 hover:text-[#dcb48c] transition-colors"
+                >
+                  <Mail className="w-4 h-4" />
+                </a>
+              )}
             </div>
           </div>
         </div>
 
         {/* Bottom Legal & Payment Strip */}
         <div className="mt-12 pt-6 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-[11px] uppercase tracking-[1px] text-white/70 text-center sm:text-left">
-            &copy; {new Date().getFullYear()} AAROHA ATELIER. ALL RIGHTS RESERVED.
+          <p
+            onClick={handleCopyrightTap}
+            className="text-[11px] uppercase tracking-[1px] text-white/70 text-center sm:text-left select-none"
+          >
+            {settings.copyrightText ||
+              `© ${new Date().getFullYear()} ${
+                settings.storeName || 'AAROHA'
+              } ATELIER. ALL RIGHTS RESERVED.`}
           </p>
 
           <div
@@ -214,3 +269,4 @@ export const Footer: React.FC<FooterProps> = ({
     </footer>
   );
 };
+

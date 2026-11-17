@@ -13,6 +13,7 @@ import {
   Sparkles,
   Trash2,
 } from 'lucide-react';
+import { useStoreData } from '../context/StoreDataContext';
 import { INDIAN_STATES } from '../data/catalog';
 import {
   CartItem,
@@ -120,6 +121,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   onGoHome,
   onOrderPlaced,
 }) => {
+  const { getDiscountRateForQty, settings } = useStoreData();
   const [address, setAddress] = useState<DeliveryAddress>({
     fullName: '',
     mobile: '',
@@ -266,7 +268,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     (sum, item) => sum + item.product.salePrice * item.quantity,
     0
   );
-  const discountRate = totalQty >= 3 ? 0.1 : totalQty >= 2 ? 0.05 : 0;
+  const discountRate = getDiscountRateForQty(totalQty);
   const discountAmount = Math.round(subtotal * discountRate);
   const finalTotal = subtotal - discountAmount;
 
@@ -368,6 +370,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
         subtotal,
         discountAmount,
         totalPaid: finalTotal,
+        status: 'Placed',
       };
       setIsPlacing(false);
       onOrderPlaced(order);
@@ -398,7 +401,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
           onClick={onGoHome}
           className="px-2 text-[12px] sm:text-[14px] font-medium uppercase tracking-[2.5px] text-[#321004] whitespace-nowrap cursor-pointer"
         >
-          AAROHA
+          {settings.storeName || 'AAROHA'}
         </button>
       </div>
     </header>

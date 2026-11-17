@@ -1,5 +1,6 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
+import { useStoreData } from '../context/StoreDataContext';
 
 interface WhatsAppButtonProps {
   hidden?: boolean;
@@ -10,13 +11,23 @@ export const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   hidden = false,
   aboveStickyBar = false,
 }) => {
+  const { settings } = useStoreData();
+  const cleanPhone = (settings.whatsappNumber || '919820041290').replace(
+    /\D/g,
+    ''
+  );
+  const storeLabel = settings.storeName || 'Aaroha';
+  const href = `https://wa.me/${cleanPhone || '919820041290'}?text=${encodeURIComponent(
+    `Hello ${storeLabel} Atelier, I would like help with an outfit.`
+  )}`;
+
   return (
     <a
-      href="https://wa.me/919820041290?text=Hello%20Aaroha%20Atelier%2C%20I%20would%20like%20help%20with%20an%20outfit."
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"
-      title="Chat with Aaroha Stylist"
+      title={`Chat with ${storeLabel} Stylist`}
       aria-hidden={hidden}
       tabIndex={hidden ? -1 : undefined}
       style={aboveStickyBar ? { bottom: '100px' } : undefined}
@@ -30,3 +41,4 @@ export const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
     </a>
   );
 };
+

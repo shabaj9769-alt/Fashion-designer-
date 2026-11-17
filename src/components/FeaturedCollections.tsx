@@ -1,5 +1,5 @@
 import React from 'react';
-import { FEATURED_CATEGORIES } from '../data/catalog';
+import { useStoreData } from '../context/StoreDataContext';
 import { SmartImage } from './SmartImage';
 
 interface FeaturedCollectionsProps {
@@ -9,6 +9,9 @@ interface FeaturedCollectionsProps {
 export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({
   onSelectCategory,
 }) => {
+  const { categories } = useStoreData();
+  if (categories.length === 0) return null;
+
   return (
     <section className="py-12 sm:py-16 bg-white">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-10">
@@ -17,7 +20,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({
         </h2>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-          {FEATURED_CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat.id}
               type="button"
@@ -45,3 +48,4 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({
     </section>
   );
 };
+

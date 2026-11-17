@@ -20,7 +20,7 @@ import {
   X,
   ZoomIn,
 } from 'lucide-react';
-import { PRODUCTS } from '../data/catalog';
+import { useStoreData } from '../context/StoreDataContext';
 import { CartItem, Product, SizeOption } from '../types/store';
 import { formatINR, getDiscountPercent } from '../utils/currency';
 import { SmartImage } from './SmartImage';
@@ -55,6 +55,13 @@ function getProductRatingStats(productId: string) {
   return { rating, reviewCount };
 }
 
+function formatDispatchLabel(dispatchDays: string): string {
+  const cleaned = (dispatchDays || '7–10 business days')
+    .replace(/^made to order in\s*/i, '')
+    .trim();
+  return cleaned || '7–10 business days';
+}
+
 export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   product,
   cartItems,
@@ -69,6 +76,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   onAddToCart,
   onOpenSizeGuide,
 }) => {
+  const { visibleProducts, settings } = useStoreData();
   const [selectedSize, setSelectedSize] = useState<SizeOption | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [customNote, setCustomNote] = useState('');
@@ -77,11 +85,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [sizeToast, setSizeToast] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [pincode, setPincode] = useState('');
-  const [pincodeResult, setPincodeResult] = useState<{
-    valid: boolean;
-    message: string;
-  } | null>(null);
 
   const sizeSectionRef = useRef<HTMLDivElement>(null);
   const toastTimerRef = useRef<number | null>(null);
@@ -96,7 +99,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     setActiveImageIdx(0);
     setShakeSizes(false);
     setSizeToast(false);
-    setPincodeResult(null);
   }, [product]);
 
   useEffect(() => {
@@ -144,23 +146,23 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   );
 
   const similarProducts = useMemo(() => {
-    const sameCategory = PRODUCTS.filter(
+    const sameCategory = visibleProducts.filter(
       (p) => p.id !== product.id && p.category === product.category
     );
-    const sameTags = PRODUCTS.filter(
+    const sameTags = visibleProducts.filter(
       (p) =>
         p.id !== product.id &&
         p.category !== product.category &&
         p.collectionTags.some((t) => product.collectionTags.includes(t))
     );
-    const remaining = PRODUCTS.filter(
+    const remaining = visibleProducts.filter(
       (p) =>
         p.id !== product.id &&
         !sameCategory.some((c) => c.id === p.id) &&
         !sameTags.some((c) => c.id === p.id)
     );
     return [...sameCategory, ...sameTags, ...remaining].slice(0, 4);
-  }, [product]);
+  }, [product, visibleProducts]);
 
   const productReviews = useMemo(
     () => [
@@ -252,22 +254,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     );
   };
 
-  const handleCheckPincode = (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleaned = pincode.trim();
-    if (!/^[1-9][0-9]{5}$/.test(cleaned)) {
-      setPincodeResult({
-        valid: false,
-        message: 'Please enter a valid 6-digit Indian PIN code.',
-      });
-      return;
-    }
-    setPincodeResult({
-      valid: true,
-      message: `Free delivery across India to ${cleaned} · ${product.dispatchDays} · UPI, Cards & COD available`,
-    });
-  };
-
   const handleShare = async () => {
     const shareUrl = window.location.href;
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -280,6 +266,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       }
     }
   };
+
+  const sortedTiers = [...settings.discountTiers].sort(
+    (a, b) => a.minQty - b.minQty
+  );
+  const multiPieceOfferSummary =
+    sortedTiers.length > 0
+      ? sortedTiers
+          .map((t) => `Buy ${t.minQty} get ${t.discountPercent}% off`)
+          .join(', ') + ' automatically in your bag.'
+      : 'Complimentary custom tailoring on every order.';
 
   return (
     <div className="bg-white pb-[100px]">
@@ -470,7 +466,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             <div className="pb-4 border-b border-[#e8e8e8]">
               <div className="flex items-center justify-between gap-2 mb-1.5">
                 <p className="text-[11px] font-medium uppercase tracking-[1.5px] text-[#c8a078]">
-                  AAROHA ATELIER · {product.category}
+                  {settings.storeName} ATELIER · {product.category}
                 </p>
                 <div className="flex items-center gap-2">
                   <button
@@ -566,7 +562,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     <strong className="font-medium text-[#000000]">
                       Multi-Piece Offer:
                     </strong>{' '}
-                    Buy 2 get 5% off, Buy 3 get 10% off automatically in your bag.
+                    {multiPieceOfferSummary}
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -697,50 +693,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               </div>
             </div>
 
-            {/* Delivery & PIN Code Check */}
+            {/* Delivery & Dispatch Info (Pincode input removed) */}
             <div className="py-5 border-b border-[#e8e8e8]">
-              <p className="text-[11px] font-medium uppercase tracking-[1.2px] text-[#000000] mb-2.5 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-[#321004]" />
-                <span>Check Delivery &amp; Dispatch</span>
+              <p className="text-[12px] text-[#343434] flex items-center gap-2">
+                <MapPin className="w-3.5 h-3.5 text-[#321004] shrink-0" />
+                <span>
+                  Free delivery across India · Made to order in{' '}
+                  {formatDispatchLabel(product.dispatchDays)}
+                </span>
               </p>
-
-              <form
-                onSubmit={handleCheckPincode}
-                className="flex items-stretch max-w-sm"
-              >
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={6}
-                  value={pincode}
-                  onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                  placeholder="Enter 6-digit PIN code (e.g. 400001)"
-                  aria-label="Enter 6-digit PIN code"
-                  className="flex-1 min-w-0 min-h-[44px] px-3.5 border border-[#e8e8e8] focus:border-[#c8a078] focus:outline-none text-[12px] text-[#000000]"
-                />
-                <button
-                  type="submit"
-                  className="min-h-[44px] px-5 bg-[#f2f2f2] hover:bg-[#321004] text-[#000000] hover:text-white border border-l-0 border-[#e8e8e8] text-[11px] font-medium uppercase tracking-[1px] transition-colors cursor-pointer"
-                >
-                  CHECK
-                </button>
-              </form>
-
-              {pincodeResult ? (
-                <p
-                  className={`mt-2 text-[12px] leading-snug ${
-                    pincodeResult.valid
-                      ? 'text-[#15803d] font-medium'
-                      : 'text-[#d74a5d]'
-                  }`}
-                >
-                  {pincodeResult.message}
-                </p>
-              ) : (
-                <p className="mt-2 text-[12px] text-[#343434]">
-                  Complimentary delivery across India · {product.dispatchDays}
-                </p>
-              )}
 
               <div className="grid grid-cols-3 gap-2.5 mt-4 pt-4 border-t border-[#e8e8e8]">
                 <div className="flex flex-col items-center text-center p-2.5 bg-[#f2f2f2]/60 border border-[#e8e8e8]">

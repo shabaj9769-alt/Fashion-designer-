@@ -1,5 +1,5 @@
 import React from 'react';
-import { IMAGES } from '../data/images';
+import { useStoreData } from '../context/StoreDataContext';
 import { SmartImage } from './SmartImage';
 
 interface EditorialSplitsProps {
@@ -9,6 +9,7 @@ interface EditorialSplitsProps {
 export const EditorialSplits: React.FC<EditorialSplitsProps> = ({
   onOpenCustomGuide,
 }) => {
+  const { settings } = useStoreData();
   return (
     <section className="py-12 sm:py-16 bg-white">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-10 space-y-12 sm:space-y-16">
@@ -16,7 +17,7 @@ export const EditorialSplits: React.FC<EditorialSplitsProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 items-stretch border border-[#e8e8e8]">
           <div className="aspect-[4/3] lg:aspect-auto lg:min-h-[420px] bg-[#f2f2f2] overflow-hidden">
             <SmartImage
-              src={IMAGES.editorialSplits.madeToOrder}
+              src={settings.editorialMadeToOrderImage}
               alt="Aaroha Made to Order Tailoring"
               width={900}
               height={700}
@@ -76,7 +77,7 @@ export const EditorialSplits: React.FC<EditorialSplitsProps> = ({
 
           <div className="order-1 lg:order-2 aspect-[4/3] lg:aspect-auto lg:min-h-[420px] bg-[#f2f2f2] overflow-hidden">
             <SmartImage
-              src={IMAGES.editorialSplits.customSizing}
+              src={settings.editorialCustomSizingImage}
               alt="Aaroha Custom Sizing Studio"
               width={900}
               height={700}
@@ -89,3 +90,4 @@ export const EditorialSplits: React.FC<EditorialSplitsProps> = ({
     </section>
   );
 };
+

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface SmartImageProps {
   src: string;
@@ -11,8 +11,8 @@ interface SmartImageProps {
 }
 
 /**
- * Renders <img> only when a non-empty URL is provided in IMAGES.
- * Otherwise renders a clean plain color/gradient block with no text, icons, or error fallback logic.
+ * Renders <img> only when a non-empty valid URL/base64 is provided.
+ * Otherwise renders a clean plain color/gradient block with no broken image icon.
  */
 export const SmartImage: React.FC<SmartImageProps> = ({
   src,
@@ -24,14 +24,19 @@ export const SmartImage: React.FC<SmartImageProps> = ({
   fallbackBg = 'linear-gradient(135deg, #f2f2f2, #e8e8e8)',
 }) => {
   const cleanSrc = src ? src.trim() : '';
+  const [failed, setFailed] = useState(false);
 
-  if (!cleanSrc) {
+  useEffect(() => {
+    setFailed(false);
+  }, [cleanSrc]);
+
+  if (!cleanSrc || failed) {
     return (
       <div
         aria-hidden="true"
         className={`w-full h-full ${className}`}
         style={{
-          background: fallbackBg,
+          background: fallbackBg || 'linear-gradient(135deg, #f2f2f2, #e8e8e8)',
           ...(aspectRatio ? { aspectRatio } : {}),
         }}
       />
@@ -44,8 +49,10 @@ export const SmartImage: React.FC<SmartImageProps> = ({
       alt={alt}
       width={width}
       height={height}
+      onError={() => setFailed(true)}
       className={`w-full h-full object-cover ${className}`}
       style={aspectRatio ? { aspectRatio } : undefined}
     />
   );
 };
+

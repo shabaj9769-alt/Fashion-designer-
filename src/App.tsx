@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { PRODUCTS } from './data/catalog';
 import { CartItem, PlacedOrder, Product, SizeOption, SortOption } from './types/store';
+import { StoreDataProvider, useStoreData } from './context/StoreDataContext';
 import { Header } from './components/Header';
 import { HeroSlideshow } from './components/HeroSlideshow';
 import { FeaturedCollections } from './components/FeaturedCollections';
@@ -19,6 +19,7 @@ import { WhatsAppButton } from './components/WhatsAppButton';
 import { ProductDetailPage } from './components/ProductDetailPage';
 import { CheckoutPage } from './components/CheckoutPage';
 import { OrderSuccessPage } from './components/OrderSuccessPage';
+import { AdminPanel } from './components/AdminPanel';
 
 const ORDER_STORAGE_KEY = 'aaroha_last_order';
 const CART_STORAGE_KEY = 'aaroha_cart_v1';
@@ -35,15 +36,19 @@ function getProductIdFromHash(hash: string): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
-function normalizeRouteHash(rawHash: string): string {
+function normalizeRouteHash(rawHash: string, availableProducts: Product[]): string {
   if (!rawHash || rawHash === '#' || rawHash === '#/' || rawHash === '#top') {
     return '#/';
   }
-  if (rawHash === '#/checkout' || rawHash === '#/order-success') {
+  if (
+    rawHash === '#/checkout' ||
+    rawHash === '#/order-success' ||
+    rawHash === '#/admin'
+  ) {
     return rawHash;
   }
   const prodId = getProductIdFromHash(rawHash);
-  if (prodId && PRODUCTS.some((p) => p.id === prodId)) {
+  if (prodId && availableProducts.some((p) => p.id === prodId)) {
     return `#/product/${encodeURIComponent(prodId)}`;
   }
   // Fallback any invalid route cleanly to Home
@@ -59,7 +64,7 @@ function loadStoredOrder(): PlacedOrder | null {
   }
 }
 
-function loadStoredCart(): CartItem[] {
+function loadStoredCart(availableProducts: Product[]): CartItem[] {
   try {
     const raw = localStorage.getItem(CART_STORAGE_KEY);
     if (!raw) return [];
@@ -69,11 +74,14 @@ function loadStoredCart(): CartItem[] {
     for (const entry of parsed) {
       if (!entry || typeof entry !== 'object') continue;
       const prodId = entry.product?.id;
-      const matched = PRODUCTS.find((p) => p.id === prodId);
+      const matched = availableProducts.find((p) => p.id === prodId);
       if (!matched) continue;
       const qty = Number(entry.quantity);
       if (!Number.isFinite(qty) || qty < 1) continue;
-      const size = typeof entry.size === 'string' ? (entry.size as SizeOption) : matched.sizes[0];
+      const size =
+        typeof entry.size === 'string'
+          ? (entry.size as SizeOption)
+          : matched.sizes[0];
       const customNote =
         typeof entry.customNote === 'string' && entry.customNote.trim()
           ? entry.customNote.trim()
@@ -93,13 +101,25 @@ function loadStoredCart(): CartItem[] {
   }
 }
 
-export default function App() {
-  const initialHash = normalizeRouteHash(window.location.hash);
+function AppContent() {
+  const { products, visibleProducts, addOrder } = useStoreData();
+  const productsRef = useRef<Product[]>(products);
+  useEffect(() => {
+    productsRef.current = products;
+  }, [products]);
+
+  const initialHash = useMemo(
+    () => normalizeRouteHash(window.location.hash, products),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const [routeHash, setRouteHash] = useState<string>(initialHash);
   const [activeFilter, setActiveFilter] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState<SortOption>('featured');
-  const [cartItems, setCartItems] = useState<CartItem[]>(() => loadStoredCart());
+  const [cartItems, setCartItems] = useState<CartItem[]>(() =>
+    loadStoredCart(products)
+  );
   const [lastOrder, setLastOrder] = useState<PlacedOrder | null>(() =>
     loadStoredOrder()
   );
@@ -132,6 +152,18 @@ export default function App() {
   useEffect(() => {
     activeOverlayRef.current = activeOverlay;
   }, [activeOverlay]);
+
+  // Keep cart item product snapshots synchronized when Admin updates/deletes products
+  useEffect(() => {
+    setCartItems((prev) =>
+      prev
+        .map((item) => {
+          const fresh = products.find((p) => p.id === item.product.id);
+          return fresh ? { ...item, product: fresh } : null;
+        })
+        .filter((item): item is CartItem => item !== null)
+    );
+  }, [products]);
 
   // Persist cart items to localStorage safely
   useEffect(() => {
@@ -169,7 +201,7 @@ export default function App() {
     setToast(null);
   };
 
-  // Seed safe initial history stack on mount so direct links (#/product/id) never exit app on Back
+  // Seed safe initial history stack on mount so direct links (#/product/id or #/admin) never exit app on Back
   useEffect(() => {
     if (window.location.hash !== initialHash) {
       window.history.replaceState(
@@ -179,7 +211,11 @@ export default function App() {
       );
     }
 
-    if (initialHash.startsWith('#/product/') || initialHash === '#/checkout') {
+    if (
+      initialHash.startsWith('#/product/') ||
+      initialHash === '#/checkout' ||
+      initialHash === '#/admin'
+    ) {
       window.history.replaceState(
         { __aaroha: true, hash: '#/', depth: 0 },
         '',
@@ -267,7 +303,7 @@ export default function App() {
       }
 
       const prevRoute = routeHashRef.current;
-      const nextRoute = normalizeRouteHash(rawHash);
+      const nextRoute = normalizeRouteHash(rawHash, productsRef.current);
 
       // Normalize invalid route back to #/
       if (rawHash !== nextRoute && !(rawHash === '' && nextRoute === '#/')) {
@@ -343,6 +379,7 @@ export default function App() {
 
   const isCheckoutRoute = routeHash === '#/checkout';
   const isOrderSuccessRoute = routeHash === '#/order-success';
+  const isAdminRoute = routeHash === '#/admin';
 
   const activeProductId = useMemo(
     () => getProductIdFromHash(routeHash),
@@ -352,9 +389,9 @@ export default function App() {
   const activeProduct = useMemo(
     () =>
       activeProductId
-        ? PRODUCTS.find((p) => p.id === activeProductId) ?? null
+        ? products.find((p) => p.id === activeProductId && p.visible !== false) ?? null
         : null,
-    [activeProductId]
+    [activeProductId, products]
   );
 
   const anyOverlayOpen = Boolean(activeOverlay) || checkoutConfirmOpen;
@@ -433,10 +470,10 @@ export default function App() {
   const filteredProducts = useMemo(() => {
     const base =
       activeFilter === 'ALL'
-        ? PRODUCTS
+        ? visibleProducts
         : activeFilter === 'SALE'
-        ? PRODUCTS.filter((p) => p.onSale)
-        : PRODUCTS.filter(
+        ? visibleProducts.filter((p) => p.onSale)
+        : visibleProducts.filter(
             (p) =>
               p.category.toLowerCase() === activeFilter.toLowerCase() ||
               p.subCategory.toLowerCase() === activeFilter.toLowerCase() ||
@@ -454,7 +491,7 @@ export default function App() {
       sorted.sort((a, b) => a.title.localeCompare(b.title));
     }
     return sorted;
-  }, [activeFilter, sortBy]);
+  }, [activeFilter, sortBy, visibleProducts]);
 
   const pushRoute = (
     targetHash: string,
@@ -554,9 +591,14 @@ export default function App() {
   };
 
   const handleOrderPlaced = (order: PlacedOrder) => {
-    setLastOrder(order);
+    const savedOrder: PlacedOrder = {
+      ...order,
+      status: order.status ?? 'Placed',
+    };
+    addOrder(savedOrder);
+    setLastOrder(savedOrder);
     try {
-      sessionStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(order));
+      sessionStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(savedOrder));
     } catch {
       // ignore storage errors
     }
@@ -568,7 +610,7 @@ export default function App() {
   };
 
   const handleSelectFilter = (filterKey: string, scroll = true) => {
-    if (activeProduct || isCheckoutRoute || isOrderSuccessRoute) {
+    if (activeProduct || isCheckoutRoute || isOrderSuccessRoute || isAdminRoute) {
       navigateToHome(filterKey, scroll);
       return;
     }
@@ -671,6 +713,15 @@ export default function App() {
     () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
     [cartItems]
   );
+
+  // Full-page Admin Panel Route (hides customer header, WhatsApp button, cart, and footer)
+  if (isAdminRoute) {
+    return (
+      <div key="admin-page" className="aaroha-page-enter">
+        <AdminPanel onExitAdmin={handleAppBack} />
+      </div>
+    );
+  }
 
   const GlobalToastBanner = toast ? (
     toast.kind === 'added' ? (
@@ -844,6 +895,7 @@ export default function App() {
         onSelectFilter={(key) => handleSelectFilter(key, true)}
         onOpenCustomGuide={(topic) => openOverlay('guide', topic)}
         onOpenAccount={() => openOverlay('account')}
+        onSecretAdminOpen={() => pushRoute('#/admin', { scrollMode: 'top' })}
       />
 
       {/* Interactive Overlays, Drawers & WhatsApp Floating Button */}
@@ -881,5 +933,13 @@ export default function App() {
 
       {GlobalToastBanner}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <StoreDataProvider>
+      <AppContent />
+    </StoreDataProvider>
   );
 }

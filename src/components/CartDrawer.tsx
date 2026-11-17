@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Minus, Plus, ShoppingBag, Sparkles, Trash2, X } from 'lucide-react';
+import { useStoreData } from '../context/StoreDataContext';
 import { CartItem, Product } from '../types/store';
 import { formatINR } from '../utils/currency';
 import { SmartImage } from './SmartImage';
@@ -23,6 +24,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onProceedToCheckout,
   onSelectProduct,
 }) => {
+  const { getDiscountRateForQty, settings } = useStoreData();
   const [removingKeys, setRemovingKeys] = useState<Record<string, boolean>>({});
   const timersRef = useRef<Record<string, number>>({});
 
@@ -62,12 +64,20 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     0
   );
 
-  // Multi-buy automatic tier discount: 2 pcs -> 5%, 3+ pcs -> 10%
-  const discountRate = totalQty >= 3 ? 0.1 : totalQty >= 2 ? 0.05 : 0;
+  const discountRate = getDiscountRateForQty(totalQty);
   const discountAmount = Math.round(subtotal * discountRate);
   const finalTotal = subtotal - discountAmount;
 
-  const progressPercent = Math.min(100, Math.round((totalQty / 3) * 100));
+  const sortedTiers = [...settings.discountTiers].sort(
+    (a, b) => a.minQty - b.minQty
+  );
+  const tier1 = sortedTiers[0] ?? { minQty: 2, discountPercent: 5 };
+  const tier2 = sortedTiers[1] ?? { minQty: 3, discountPercent: 10 };
+  const maxGoal = Math.max(tier2.minQty, tier1.minQty, 3);
+  const progressPercent = Math.min(
+    100,
+    Math.round((totalQty / maxGoal) * 100)
+  );
 
   return (
     <div
@@ -109,11 +119,19 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             <span className={totalQty >= 1 ? 'text-[#321004] font-medium' : ''}>
               1+ FREE SHIP
             </span>
-            <span className={totalQty >= 2 ? 'text-[#321004] font-medium' : ''}>
-              2+ 5% OFF
+            <span
+              className={
+                totalQty >= tier1.minQty ? 'text-[#321004] font-medium' : ''
+              }
+            >
+              {tier1.minQty}+ {tier1.discountPercent}% OFF
             </span>
-            <span className={totalQty >= 3 ? 'text-[#d74a5d] font-medium' : ''}>
-              3+ 10% OFF
+            <span
+              className={
+                totalQty >= tier2.minQty ? 'text-[#d74a5d] font-medium' : ''
+              }
+            >
+              {tier2.minQty}+ {tier2.discountPercent}% OFF
             </span>
           </div>
         </div>

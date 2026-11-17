@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
-import { PRODUCTS } from '../data/catalog';
+import { useStoreData } from '../context/StoreDataContext';
 import { Product } from '../types/store';
 import { formatINR, getDiscountPercent } from '../utils/currency';
 import { SmartImage } from './SmartImage';
@@ -27,6 +27,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({
   onSelectProduct,
   onSelectFilter,
 }) => {
+  const { visibleProducts } = useStoreData();
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -40,8 +41,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return PRODUCTS.slice(0, 4);
-    return PRODUCTS.filter(
+    if (!q) return visibleProducts.slice(0, 4);
+    return visibleProducts.filter(
       (p) =>
         p.title.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
@@ -49,7 +50,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({
         p.fabric.toLowerCase().includes(q) ||
         p.collectionTags.some((tag) => tag.toLowerCase().includes(q))
     );
-  }, [query]);
+  }, [query, visibleProducts]);
 
   if (!open) return null;
 

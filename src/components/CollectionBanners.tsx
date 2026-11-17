@@ -1,5 +1,5 @@
 import React from 'react';
-import { COLLECTION_BANNERS } from '../data/catalog';
+import { useStoreData } from '../context/StoreDataContext';
 import { SmartImage } from './SmartImage';
 
 interface CollectionBannersProps {
@@ -9,11 +9,14 @@ interface CollectionBannersProps {
 export const CollectionBanners: React.FC<CollectionBannersProps> = ({
   onSelectCollection,
 }) => {
+  const { collectionBanners } = useStoreData();
+  if (collectionBanners.length === 0) return null;
+
   return (
     <section className="py-12 sm:py-16 bg-white">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-10">
         <div className="aaroha-banners-grid">
-          {COLLECTION_BANNERS.map((banner) => (
+          {collectionBanners.map((banner) => (
             <div
               key={banner.id}
               className="group relative min-h-[420px] sm:min-h-[480px] lg:min-h-[540px] flex flex-col justify-end overflow-hidden bg-[#321004]"
@@ -70,3 +73,4 @@ export const CollectionBanners: React.FC<CollectionBannersProps> = ({
     </section>
   );
 };
+

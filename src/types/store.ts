@@ -16,6 +16,7 @@ export interface Product {
   description: string;
   sizes: SizeOption[];
   dispatchDays: string;
+  visible?: boolean;
 }
 
 export interface CartItem {
@@ -27,6 +28,13 @@ export interface CartItem {
 }
 
 export type PaymentMethodId = 'upi' | 'card' | 'netbanking' | 'cod';
+
+export type OrderStatus =
+  | 'Placed'
+  | 'Packed'
+  | 'Shipped'
+  | 'Delivered'
+  | 'Cancelled';
 
 export interface DeliveryAddress {
   fullName: string;
@@ -49,6 +57,7 @@ export interface PlacedOrder {
   subtotal: number;
   discountAmount: number;
   totalPaid: number;
+  status?: OrderStatus;
 }
 
 export interface HeroSlide {
@@ -90,6 +99,7 @@ export interface TestimonialItem {
   city: string;
   review: string;
   outfitBought: string;
+  rating?: number;
   avatar?: string;
 }
 
@@ -105,3 +115,36 @@ export interface NavItem {
   columns?: MegaMenuColumn[];
   megaImage?: string;
 }
+
+export interface DiscountTier {
+  minQty: number;
+  discountPercent: number;
+}
+
+export interface StoreSettings {
+  storeName: string;
+  whatsappNumber: string;
+  email: string;
+  phone: string;
+  address: string;
+  instagramUrl: string;
+  facebookUrl: string;
+  discountTiers: DiscountTier[];
+  footerText: string;
+  copyrightText: string;
+  editorialMadeToOrderImage: string;
+  editorialCustomSizingImage: string;
+  adminPasswordHash: string;
+}
+
+export interface StoreDataState {
+  products: Product[];
+  heroSlides: HeroSlide[];
+  categories: FeaturedCategory[];
+  collectionBanners: CollectionBannerItem[];
+  testimonials: TestimonialItem[];
+  navItems: NavItem[];
+  orders: PlacedOrder[];
+  settings: StoreSettings;
+}
+

@@ -8,7 +8,7 @@ import {
   User,
   X,
 } from 'lucide-react';
-import { NAV_ITEMS } from '../data/catalog';
+import { useStoreData } from '../context/StoreDataContext';
 import { SmartImage } from './SmartImage';
 
 interface HeaderProps {
@@ -34,6 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSearch,
   onOpenAccount,
 }) => {
+  const { navItems, settings } = useStoreData();
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
   const [expandedMobileGroup, setExpandedMobileGroup] = useState<string | null>(
     null
@@ -44,8 +45,11 @@ export const Header: React.FC<HeaderProps> = ({
     setHoveredMenu(null);
   };
 
-  const activeMegaItem = NAV_ITEMS.find(
-    (item) => item.label === hoveredMenu && item.columns
+  const activeMegaItem = navItems.find(
+    (item) =>
+      item.label === hoveredMenu &&
+      item.columns &&
+      item.columns.some((c) => c.links.length > 0)
   );
 
   return (
@@ -70,21 +74,24 @@ export const Header: React.FC<HeaderProps> = ({
               aria-label="Primary navigation"
               className="aaroha-desktop-nav items-center gap-3.5 xl:gap-5"
             >
-              {NAV_ITEMS.map((item) => {
+              {navItems.map((item) => {
                 const isActive = activeFilter === item.filterKey;
+                const hasColumns = Boolean(
+                  item.columns && item.columns.some((c) => c.links.length > 0)
+                );
                 return (
                   <div
                     key={item.label}
                     className="relative py-2"
                     onMouseEnter={() =>
-                      setHoveredMenu(item.columns ? item.label : null)
+                      setHoveredMenu(hasColumns ? item.label : null)
                     }
                   >
                     <button
                       type="button"
                       onClick={() => handleNavClick(item.filterKey)}
                       aria-expanded={
-                        item.columns ? hoveredMenu === item.label : undefined
+                        hasColumns ? hoveredMenu === item.label : undefined
                       }
                       className={`inline-flex items-center gap-1 text-[11px] xl:text-[12px] font-medium uppercase tracking-[1px] whitespace-nowrap shrink-0 pb-0.5 border-b transition-colors duration-150 ${
                         item.isSale
@@ -95,7 +102,7 @@ export const Header: React.FC<HeaderProps> = ({
                       }`}
                     >
                       <span>{item.label}</span>
-                      {item.columns && (
+                      {hasColumns && (
                         <ChevronDown className="w-3 h-3 opacity-70" />
                       )}
                     </button>
@@ -120,7 +127,7 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               className="text-[18px] sm:text-[24px] font-medium uppercase tracking-[3px] sm:tracking-[4px] text-[#000000] whitespace-nowrap shrink-0 select-none"
             >
-              AAROHA
+              {settings.storeName || 'AAROHA'}
             </a>
           </div>
 
@@ -238,7 +245,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="relative w-full max-w-[340px] bg-white h-[100dvh] flex flex-col z-10 shadow-xl overflow-hidden">
             <div className="shrink-0 flex items-center justify-between px-5 h-16 border-b border-[#e8e8e8]">
               <span className="text-[16px] font-medium uppercase tracking-[3px] text-[#000000]">
-                AAROHA
+                {settings.storeName || 'AAROHA'}
               </span>
               <button
                 type="button"
@@ -259,8 +266,10 @@ export const Header: React.FC<HeaderProps> = ({
                 All Collections
               </button>
 
-              {NAV_ITEMS.map((item) => {
-                const hasChildren = Boolean(item.columns?.length);
+              {navItems.map((item) => {
+                const hasChildren = Boolean(
+                  item.columns?.some((c) => c.links.length > 0)
+                );
                 const isExpanded = expandedMobileGroup === item.label;
                 return (
                   <div key={item.label} className="border-b border-[#e8e8e8]">
@@ -328,3 +337,4 @@ export const Header: React.FC<HeaderProps> = ({
     </>
   );
 };
+
