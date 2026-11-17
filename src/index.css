@@ -202,7 +202,22 @@
 @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
   .aaroha-checkout-grid {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 16px;
+  }
+}
+
+.aaroha-checkout-input {
+  scroll-margin-top: 80px;
+}
+
+/* Cart Drawer shipping row: only visible when screen height > 720px */
+.aaroha-cart-shipping-row {
+  display: none;
+}
+
+@media (min-height: 721px) {
+  .aaroha-cart-shipping-row {
+    display: flex;
   }
 }
 

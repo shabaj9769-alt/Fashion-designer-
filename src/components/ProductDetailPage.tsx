@@ -221,13 +221,22 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     setSizeToast(false);
   };
 
-  const isSelectedSizeInBag = useMemo(() => {
-    if (!selectedSize) return false;
+  const getBagItemForSize = (size: SizeOption): CartItem | undefined => {
+    const cleanNote =
+      size === 'Custom' ? customNote.trim() || undefined : undefined;
+    const targetKey = `${product.id}__${size}__${cleanNote ?? ''}`;
+    return cartItems.find((item) => item.key === targetKey);
+  };
+
+  const selectedSizeBagItem = useMemo(() => {
+    if (!selectedSize) return undefined;
     const cleanNote =
       selectedSize === 'Custom' ? customNote.trim() || undefined : undefined;
     const targetKey = `${product.id}__${selectedSize}__${cleanNote ?? ''}`;
-    return cartItems.some((item) => item.key === targetKey);
+    return cartItems.find((item) => item.key === targetKey);
   }, [cartItems, product.id, selectedSize, customNote]);
+
+  const isSelectedSizeInBag = Boolean(selectedSizeBagItem);
 
   const handleAddToBag = (openCheckout = false) => {
     if (!selectedSize) {
@@ -602,24 +611,43 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               >
                 {product.sizes.map((size) => {
                   const active = selectedSize === size;
+                  const bagItem = getBagItemForSize(size);
+                  const inBag = Boolean(bagItem);
                   return (
                     <button
                       key={size}
                       type="button"
                       onClick={() => handleSelectSizeChip(size)}
-                      className={`min-w-[52px] min-h-[46px] px-3.5 text-[12px] font-medium uppercase tracking-[0.8px] border transition-colors cursor-pointer ${
+                      className={`relative min-w-[52px] min-h-[46px] px-3.5 text-[12px] font-medium uppercase tracking-[0.8px] border transition-colors cursor-pointer ${
                         active
                           ? 'bg-[#321004] text-white border-[#321004]'
                           : sizeToast
                           ? 'bg-white text-[#000000] border-[#d74a5d]'
+                          : inBag
+                          ? 'bg-white text-[#000000] border-[#15803d]/60 hover:border-[#15803d]'
                           : 'bg-white text-[#000000] border-[#e8e8e8] hover:border-[#c8a078]'
                       }`}
                     >
-                      {size}
+                      <span>{size}</span>
+                      {inBag && (
+                        <span
+                          aria-label={`Size ${size} already in bag`}
+                          className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-[#15803d] text-white text-[9px] font-bold leading-none flex items-center justify-center"
+                        >
+                          ✓
+                        </span>
+                      )}
                     </button>
                   );
                 })}
               </div>
+
+              {selectedSize && selectedSizeBagItem && (
+                <p className="mt-2.5 text-[12px] font-medium text-[#15803d]">
+                  ✓ Size {selectedSize} is already in your bag (Qty{' '}
+                  {selectedSizeBagItem.quantity})
+                </p>
+              )}
 
               {selectedSize === 'Custom' && (
                 <div className="mt-3.5 p-3.5 bg-[#f2f2f2]/80 border border-[#c8a078]">

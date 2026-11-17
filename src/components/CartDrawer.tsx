@@ -80,7 +80,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
       <div className="aaroha-cart-panel relative z-10 bg-white flex flex-col h-[100dvh] shadow-2xl overflow-hidden">
         {/* Fixed Header */}
-        <div className="shrink-0 px-4 py-3.5 border-b border-[#e8e8e8] flex items-center justify-between bg-white">
+        <div className="shrink-0 px-4 py-2.5 border-b border-[#e8e8e8] flex items-center justify-between bg-white">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-4 h-4 text-[#321004]" />
             <h2 className="text-[14px] font-medium uppercase tracking-[1.2px] text-[#000000]">
@@ -91,21 +91,21 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close shopping bag"
-            className="w-11 h-11 -mr-2 flex items-center justify-center text-[#343434] hover:text-[#d74a5d] cursor-pointer"
+            className="w-10 h-10 -mr-2 flex items-center justify-center text-[#343434] hover:text-[#d74a5d] cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Fixed Thin Progress Bar + 3 Short Labels */}
-        <div className="shrink-0 px-4 py-2.5 bg-[#f2f2f2] border-b border-[#e8e8e8]">
+        <div className="shrink-0 px-4 py-2 bg-[#f2f2f2] border-b border-[#e8e8e8]">
           <div className="w-full h-1.5 bg-[#e8e8e8] overflow-hidden">
             <div
               className="h-full bg-[#d74a5d] transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
-          <div className="flex justify-between text-[10px] uppercase tracking-[0.8px] text-[#777777] mt-1.5">
+          <div className="flex justify-between text-[10px] uppercase tracking-[0.8px] text-[#777777] mt-1">
             <span className={totalQty >= 1 ? 'text-[#321004] font-medium' : ''}>
               1+ FREE SHIP
             </span>
@@ -119,7 +119,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         </div>
 
         {/* Scrollable Items List (flex: 1, min-height: 0, overflow-y: auto) */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3">
           {items.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center py-12">
               <ShoppingBag className="w-10 h-10 text-[#c8a078] stroke-[1.3] mb-3" />
@@ -144,7 +144,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 return (
                   <div
                     key={item.key}
-                    className={`py-4 first:pt-0 flex items-start gap-3 transition-all duration-200 ${
+                    className={`py-3.5 first:pt-0 flex items-start gap-3 transition-all duration-200 ${
                       isRemoving
                         ? 'opacity-0 -translate-x-2 pointer-events-none'
                         : 'opacity-100 translate-x-0'
@@ -251,31 +251,31 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
         {/* Fixed Compact Footer */}
         {items.length > 0 && (
-          <div className="shrink-0 p-4 bg-white border-t border-[#e8e8e8] space-y-2.5">
-            <div className="space-y-1 text-[12px] tabular-nums">
-              <div className="flex justify-between text-[#343434]">
+          <div className="shrink-0 p-3 bg-white border-t border-[#e8e8e8] space-y-2">
+            <div className="space-y-1 text-[12px] leading-4 tabular-nums">
+              <div className="flex justify-between text-[12px] leading-4 text-[#343434]">
                 <span>Subtotal</span>
                 <span>{formatINR(subtotal)}</span>
               </div>
 
               {discountAmount > 0 && (
-                <div className="flex justify-between text-[#15803d] font-medium">
+                <div className="flex justify-between text-[12px] leading-4 text-[#15803d] font-medium">
                   <span className="inline-flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <Sparkles className="w-3.5 h-3.5 shrink-0" />
                     Multi-Piece Discount ({Math.round(discountRate * 100)}% Off)
                   </span>
                   <span>-{formatINR(discountAmount)}</span>
                 </div>
               )}
 
-              <div className="flex justify-between text-[#343434]">
+              <div className="aaroha-cart-shipping-row justify-between text-[12px] leading-4 text-[#343434]">
                 <span>Shipping</span>
-                <span className="uppercase text-[11px] font-medium text-[#15803d]">
+                <span className="uppercase text-[12px] leading-4 font-medium text-[#15803d]">
                   FREE
                 </span>
               </div>
 
-              <div className="flex justify-between text-[14px] font-semibold text-[#000000] pt-1.5 border-t border-[#e8e8e8]">
+              <div className="flex justify-between text-[15px] leading-tight font-semibold text-[#000000] pt-1.5 border-t border-[#e8e8e8]">
                 <span>Estimated Total</span>
                 <span>{formatINR(finalTotal)}</span>
               </div>
@@ -284,7 +284,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             <button
               type="button"
               onClick={onProceedToCheckout}
-              className="w-full min-h-[46px] py-3 bg-[#d74a5d] hover:bg-[#321004] text-white text-[12px] font-medium uppercase tracking-[1.5px] transition-colors cursor-pointer"
+              className="w-full min-h-[44px] py-2.5 bg-[#d74a5d] hover:bg-[#321004] text-white text-[12px] font-medium uppercase tracking-[1.5px] whitespace-nowrap transition-colors cursor-pointer"
             >
               PROCEED TO CHECKOUT
             </button>

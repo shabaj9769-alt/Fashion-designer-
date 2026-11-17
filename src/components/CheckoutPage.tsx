@@ -140,8 +140,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   const [isPlacing, setIsPlacing] = useState(false);
   const [removingKeys, setRemovingKeys] = useState<Record<string, boolean>>({});
 
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+
   const formRef = useRef<HTMLFormElement>(null);
   const removeTimersRef = useRef<Record<string, number>>({});
+  const focusOutTimerRef = useRef<number | null>(null);
+  const scrollIntoViewTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
@@ -150,6 +154,77 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
         window.clearTimeout(id)
       );
       removeTimersRef.current = {};
+    };
+  }, []);
+
+  useEffect(() => {
+    const isFormElement = (el: EventTarget | null): el is HTMLElement => {
+      if (!el || !(el instanceof HTMLElement)) return false;
+      const tag = el.tagName;
+      if (tag === 'INPUT') {
+        const type = (el as HTMLInputElement).type;
+        return (
+          type !== 'radio' &&
+          type !== 'checkbox' &&
+          type !== 'button' &&
+          type !== 'submit'
+        );
+      }
+      return tag === 'SELECT' || tag === 'TEXTAREA';
+    };
+
+    const handleFocusIn = (e: FocusEvent) => {
+      if (!isFormElement(e.target)) return;
+      if (focusOutTimerRef.current) {
+        window.clearTimeout(focusOutTimerRef.current);
+        focusOutTimerRef.current = null;
+      }
+      setKeyboardOpen(true);
+      const targetEl = e.target;
+      if (scrollIntoViewTimerRef.current) {
+        window.clearTimeout(scrollIntoViewTimerRef.current);
+      }
+      scrollIntoViewTimerRef.current = window.setTimeout(() => {
+        targetEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }, 250);
+    };
+
+    const handleFocusOut = (e: FocusEvent) => {
+      if (!isFormElement(e.target)) return;
+      if (focusOutTimerRef.current) {
+        window.clearTimeout(focusOutTimerRef.current);
+      }
+      focusOutTimerRef.current = window.setTimeout(() => {
+        if (!isFormElement(document.activeElement)) {
+          setKeyboardOpen(false);
+        }
+      }, 150);
+    };
+
+    const vv = window.visualViewport;
+    const handleViewportResize = () => {
+      if (!vv) return;
+      if (vv.height < window.innerHeight * 0.75) {
+        setKeyboardOpen(true);
+      } else if (!isFormElement(document.activeElement)) {
+        setKeyboardOpen(false);
+      }
+    };
+
+    document.addEventListener('focusin', handleFocusIn);
+    document.addEventListener('focusout', handleFocusOut);
+    vv?.addEventListener('resize', handleViewportResize);
+
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('focusout', handleFocusOut);
+      vv?.removeEventListener('resize', handleViewportResize);
+      if (focusOutTimerRef.current) {
+        window.clearTimeout(focusOutTimerRef.current);
+      }
+      if (scrollIntoViewTimerRef.current) {
+        window.clearTimeout(scrollIntoViewTimerRef.current);
+      }
     };
   }, []);
 
@@ -301,7 +376,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
   const CheckoutHeader = (
     <header className="aaroha-sticky-topbar bg-white border-b border-[#e8e8e8]">
-      <div className="max-w-[1440px] mx-auto px-2 sm:px-6 lg:px-8 h-14 grid grid-cols-[44px_1fr_auto] items-center gap-2">
+      <div className="max-w-[1440px] mx-auto px-2 sm:px-6 lg:px-8 h-[48px] grid grid-cols-[44px_1fr_auto] items-center gap-2">
         <button
           type="button"
           onClick={() => onRequestBack(isDirty && items.length > 0)}
@@ -354,14 +429,24 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f2f2f2]/45 pb-[100px]">
+    <div
+      className={`min-h-screen flex flex-col bg-[#f2f2f2]/45 ${
+        keyboardOpen ? 'pb-[24px]' : 'pb-[100px]'
+      }`}
+    >
       {CheckoutHeader}
 
-      <main className="flex-1 max-w-[1240px] w-full mx-auto px-4 sm:px-8 pt-6 sm:pt-8">
-        {/* Step Indicator */}
+      <main
+        className={`flex-1 max-w-[1240px] w-full mx-auto px-3 sm:px-8 ${
+          keyboardOpen ? 'pt-3 sm:pt-6' : 'pt-4 sm:pt-8'
+        }`}
+      >
+        {/* Step Indicator (hidden while virtual keyboard is open) */}
         <nav
           aria-label="Checkout progress"
-          className="flex items-center justify-center gap-2 sm:gap-3 text-[11px] uppercase tracking-[1.2px] text-[#777777] mb-6 pb-4 border-b border-[#e8e8e8]"
+          className={`${
+            keyboardOpen ? 'hidden' : 'flex'
+          } items-center justify-center gap-2 sm:gap-3 text-[11px] uppercase tracking-[1.2px] text-[#777777] mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-[#e8e8e8]`}
         >
           <span>Bag</span>
           <span aria-hidden="true">→</span>
@@ -377,30 +462,36 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
           className="aaroha-checkout-grid"
         >
           {/* LEFT COLUMN: Delivery Address + Payment Method */}
-          <div className="space-y-6 min-w-0">
+          <div className="space-y-4 sm:space-y-6 min-w-0">
             {/* Delivery Address Form */}
-            <section className="bg-white border border-[#e8e8e8] p-5 sm:p-7">
-              <h1 className="text-[15px] sm:text-[16px] font-medium uppercase tracking-[1px] text-[#000000] pb-3.5 mb-5 border-b border-[#e8e8e8]">
+            <section className="bg-white border border-[#e8e8e8] p-4 sm:p-7">
+              <h1
+                className={`${
+                  keyboardOpen ? 'hidden' : 'block'
+                } text-[15px] sm:text-[16px] font-medium uppercase tracking-[1px] text-[#000000] pb-3 mb-4 border-b border-[#e8e8e8]`}
+              >
                 Delivery Address
               </h1>
 
-              <div className="space-y-[14px]">
+              <div className="space-y-[12px]">
                 <div>
                   <label
                     htmlFor="checkout-fullName"
-                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1.5"
+                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1"
                   >
                     Full Name *
                   </label>
                   <input
                     id="checkout-fullName"
                     type="text"
+                    autoComplete="name"
+                    enterKeyHint="next"
                     value={address.fullName}
                     onChange={(e) =>
                       updateAddressField('fullName', e.target.value)
                     }
                     placeholder="Enter your full name"
-                    className={`w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
+                    className={`aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
                       errors.fullName
                         ? 'border-[#d74a5d]'
                         : 'border-[#e8e8e8] focus:border-[#321004]'
@@ -416,14 +507,16 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 <div>
                   <label
                     htmlFor="checkout-mobile"
-                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1.5"
+                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1"
                   >
                     Mobile Number (10 Digits) *
                   </label>
                   <input
                     id="checkout-mobile"
                     type="tel"
-                    inputMode="numeric"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    enterKeyHint="next"
                     maxLength={10}
                     value={address.mobile}
                     onChange={(e) =>
@@ -433,7 +526,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       )
                     }
                     placeholder="10-digit mobile number"
-                    className={`w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
+                    className={`aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
                       errors.mobile
                         ? 'border-[#d74a5d]'
                         : 'border-[#e8e8e8] focus:border-[#321004]'
@@ -449,17 +542,19 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 <div>
                   <label
                     htmlFor="checkout-email"
-                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1.5"
+                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1"
                   >
                     Email Address *
                   </label>
                   <input
                     id="checkout-email"
                     type="email"
+                    autoComplete="email"
+                    enterKeyHint="next"
                     value={address.email}
                     onChange={(e) => updateAddressField('email', e.target.value)}
                     placeholder="you@example.com"
-                    className={`w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
+                    className={`aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
                       errors.email
                         ? 'border-[#d74a5d]'
                         : 'border-[#e8e8e8] focus:border-[#321004]'
@@ -475,19 +570,21 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 <div>
                   <label
                     htmlFor="checkout-addressLine1"
-                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1.5"
+                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1"
                   >
                     Address Line 1 *
                   </label>
                   <input
                     id="checkout-addressLine1"
                     type="text"
+                    autoComplete="address-line1"
+                    enterKeyHint="next"
                     value={address.addressLine1}
                     onChange={(e) =>
                       updateAddressField('addressLine1', e.target.value)
                     }
                     placeholder="House / Flat No., Building, Street"
-                    className={`w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
+                    className={`aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
                       errors.addressLine1
                         ? 'border-[#d74a5d]'
                         : 'border-[#e8e8e8] focus:border-[#321004]'
@@ -503,36 +600,40 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 <div>
                   <label
                     htmlFor="checkout-addressLine2"
-                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1.5"
+                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1"
                   >
                     Address Line 2 (Optional)
                   </label>
                   <input
                     id="checkout-addressLine2"
                     type="text"
+                    autoComplete="address-line2"
+                    enterKeyHint="next"
                     value={address.addressLine2}
                     onChange={(e) =>
                       updateAddressField('addressLine2', e.target.value)
                     }
                     placeholder="Landmark, Area, Colony"
-                    className="w-full h-[48px] px-3.5 bg-white border border-[#e8e8e8] focus:border-[#321004] text-[16px] text-[#000000] focus:outline-none"
+                    className="aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border border-[#e8e8e8] focus:border-[#321004] text-[16px] text-[#000000] focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="checkout-city"
-                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1.5"
+                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1"
                   >
                     City *
                   </label>
                   <input
                     id="checkout-city"
                     type="text"
+                    autoComplete="address-level2"
+                    enterKeyHint="next"
                     value={address.city}
                     onChange={(e) => updateAddressField('city', e.target.value)}
                     placeholder="e.g. Jaipur, Mumbai, Bengaluru"
-                    className={`w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
+                    className={`aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
                       errors.city
                         ? 'border-[#d74a5d]'
                         : 'border-[#e8e8e8] focus:border-[#321004]'
@@ -548,15 +649,16 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 <div>
                   <label
                     htmlFor="checkout-state"
-                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1.5"
+                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1"
                   >
                     State *
                   </label>
                   <select
                     id="checkout-state"
+                    autoComplete="address-level1"
                     value={address.state}
                     onChange={(e) => updateAddressField('state', e.target.value)}
-                    className={`w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none cursor-pointer ${
+                    className={`aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none cursor-pointer ${
                       errors.state
                         ? 'border-[#d74a5d]'
                         : 'border-[#e8e8e8] focus:border-[#321004]'
@@ -579,7 +681,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 <div>
                   <label
                     htmlFor="checkout-pincode"
-                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1.5"
+                    className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1"
                   >
                     Pincode (6 Digits) *
                   </label>
@@ -587,6 +689,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                     id="checkout-pincode"
                     type="tel"
                     inputMode="numeric"
+                    autoComplete="postal-code"
+                    enterKeyHint="done"
                     maxLength={6}
                     value={address.pincode}
                     onChange={(e) =>
@@ -596,7 +700,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       )
                     }
                     placeholder="6-digit PIN code"
-                    className={`w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
+                    className={`aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
                       errors.pincode
                         ? 'border-[#d74a5d]'
                         : 'border-[#e8e8e8] focus:border-[#321004]'
@@ -612,8 +716,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             </section>
 
             {/* Payment Method */}
-            <section className="bg-white border border-[#e8e8e8] p-5 sm:p-7">
-              <h2 className="text-[15px] sm:text-[16px] font-medium uppercase tracking-[1px] text-[#000000] pb-3.5 mb-5 border-b border-[#e8e8e8]">
+            <section className="bg-white border border-[#e8e8e8] p-4 sm:p-7">
+              <h2
+                className={`${
+                  keyboardOpen ? 'hidden' : 'block'
+                } text-[15px] sm:text-[16px] font-medium uppercase tracking-[1px] text-[#000000] pb-3 mb-4 border-b border-[#e8e8e8]`}
+              >
                 Payment Method
               </h2>
 
@@ -630,7 +738,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                           : 'border-[#e8e8e8] bg-white'
                       }`}
                     >
-                      <label className="flex items-start gap-3 p-4 cursor-pointer">
+                      <label className="flex items-start gap-3 p-3.5 sm:p-4 cursor-pointer">
                         <input
                           type="radio"
                           name="paymentMethod"
@@ -671,6 +779,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                           <input
                             id="checkout-upiId"
                             type="text"
+                            enterKeyHint="done"
                             value={upiId}
                             onChange={(e) => {
                               setUpiId(e.target.value);
@@ -679,7 +788,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                               }
                             }}
                             placeholder="yourname@okaxis"
-                            className={`w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
+                            className={`aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
                               errors.upiId
                                 ? 'border-[#d74a5d]'
                                 : 'border-[#e8e8e8] focus:border-[#321004]'
@@ -694,11 +803,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       )}
 
                       {active && option.id === 'card' && (
-                        <div className="px-4 pb-4 pt-2 border-t border-[#e8e8e8]/80 space-y-[14px]">
+                        <div className="px-4 pb-4 pt-2 border-t border-[#e8e8e8]/80 space-y-[12px]">
                           <div>
                             <label
                               htmlFor="checkout-cardNumber"
-                              className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1.5"
+                              className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1"
                             >
                               Card Number *
                             </label>
@@ -706,16 +815,17 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                               id="checkout-cardNumber"
                               type="tel"
                               inputMode="numeric"
+                              autoComplete="cc-number"
+                              enterKeyHint="next"
                               maxLength={19}
                               value={cardNumber}
                               onChange={(e) => {
                                 const raw = e.target.value
                                   .replace(/\D/g, '')
                                   .slice(0, 16);
-                                const grouped = raw.replace(
-                                  /(.{4})/g,
-                                  '$1 '
-                                ).trim();
+                                const grouped = raw
+                                  .replace(/(.{4})/g, '$1 ')
+                                  .trim();
                                 setCardNumber(grouped);
                                 if (errors.cardNumber) {
                                   setErrors((p) => ({
@@ -725,7 +835,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                                 }
                               }}
                               placeholder="1234 5678 9012 3456"
-                              className={`w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
+                              className={`aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
                                 errors.cardNumber
                                   ? 'border-[#d74a5d]'
                                   : 'border-[#e8e8e8] focus:border-[#321004]'
@@ -742,7 +852,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                             <div>
                               <label
                                 htmlFor="checkout-cardExpiry"
-                                className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1.5"
+                                className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1"
                               >
                                 Expiry (MM/YY) *
                               </label>
@@ -750,6 +860,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                                 id="checkout-cardExpiry"
                                 type="text"
                                 inputMode="numeric"
+                                autoComplete="cc-exp"
+                                enterKeyHint="next"
                                 maxLength={5}
                                 value={cardExpiry}
                                 onChange={(e) => {
@@ -769,7 +881,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                                   }
                                 }}
                                 placeholder="MM/YY"
-                                className={`w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
+                                className={`aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
                                   errors.cardExpiry
                                     ? 'border-[#d74a5d]'
                                     : 'border-[#e8e8e8] focus:border-[#321004]'
@@ -785,7 +897,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                             <div>
                               <label
                                 htmlFor="checkout-cardCvv"
-                                className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1.5"
+                                className="block text-[11px] font-medium uppercase tracking-[1px] text-[#343434] mb-1"
                               >
                                 CVV *
                               </label>
@@ -793,6 +905,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                                 id="checkout-cardCvv"
                                 type="password"
                                 inputMode="numeric"
+                                autoComplete="cc-csc"
+                                enterKeyHint="done"
                                 maxLength={4}
                                 value={cardCvv}
                                 onChange={(e) => {
@@ -805,7 +919,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                                   }
                                 }}
                                 placeholder="123"
-                                className={`w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
+                                className={`aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border text-[16px] text-[#000000] focus:outline-none ${
                                   errors.cardCvv
                                     ? 'border-[#d74a5d]'
                                     : 'border-[#e8e8e8] focus:border-[#321004]'
@@ -833,7 +947,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                             id="checkout-bank"
                             value={selectedBank}
                             onChange={(e) => setSelectedBank(e.target.value)}
-                            className="w-full h-[48px] px-3.5 bg-white border border-[#e8e8e8] focus:border-[#321004] text-[16px] text-[#000000] focus:outline-none cursor-pointer"
+                            className="aaroha-checkout-input scroll-mt-[80px] w-full h-[48px] px-3.5 bg-white border border-[#e8e8e8] focus:border-[#321004] text-[16px] text-[#000000] focus:outline-none cursor-pointer"
                           >
                             {NETBANKING_BANKS.map((bank) => (
                               <option key={bank} value={bank}>
@@ -857,8 +971,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
           </div>
 
           {/* RIGHT COLUMN: Order Summary Card */}
-          <aside className="bg-white border border-[#e8e8e8] p-5 sm:p-6 min-w-0">
-            <h2 className="text-[15px] font-medium uppercase tracking-[1px] text-[#000000] pb-3.5 mb-4 border-b border-[#e8e8e8]">
+          <aside className="bg-white border border-[#e8e8e8] p-4 sm:p-6 min-w-0">
+            <h2
+              className={`${
+                keyboardOpen ? 'hidden' : 'block'
+              } text-[15px] sm:text-[16px] font-medium uppercase tracking-[1px] text-[#000000] pb-3 mb-4 border-b border-[#e8e8e8]`}
+            >
               Order Summary ({totalQty} {totalQty === 1 ? 'piece' : 'pieces'})
             </h2>
 
@@ -1019,14 +1137,20 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
         </div>
       )}
 
-      {/* Single Sticky Bottom Bar */}
-      <div className="fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[#e8e8e8] shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-4">
-          <div className="tabular-nums">
-            <p className="text-[10px] uppercase tracking-[0.8px] text-[#777777]">
-              Total Payable
+      {/* Single Sticky Bottom Bar (hidden when virtual keyboard is open) */}
+      <div
+        className={`fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[#e8e8e8] shadow-[0_-4px_16px_rgba(0,0,0,0.08)] transition-transform duration-200 ${
+          keyboardOpen
+            ? 'hidden translate-y-full pointer-events-none'
+            : 'translate-y-0'
+        }`}
+      >
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-2.5 flex items-center justify-between gap-4">
+          <div className="tabular-nums shrink-0">
+            <p className="text-[10px] uppercase tracking-[0.8px] text-[#777777] whitespace-nowrap">
+              TOTAL
             </p>
-            <p className="text-[18px] sm:text-[20px] font-semibold text-[#000000] leading-tight">
+            <p className="text-[18px] font-semibold text-[#000000] leading-tight whitespace-nowrap">
               {formatINR(finalTotal)}
             </p>
           </div>
@@ -1035,15 +1159,15 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             type="button"
             disabled={isPlacing || items.length === 0}
             onClick={() => handlePlaceOrder()}
-            className="min-h-[48px] px-7 sm:px-10 bg-[#321004] hover:bg-[#d74a5d] disabled:opacity-60 text-white text-[12px] font-medium uppercase tracking-[1.5px] flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            className="min-h-[48px] px-6 sm:px-10 bg-[#321004] hover:bg-[#d74a5d] disabled:opacity-60 text-white text-[12px] font-medium uppercase tracking-[1.5px] whitespace-nowrap flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
             {isPlacing ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Placing order...</span>
+                <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                <span className="whitespace-nowrap">Placing order...</span>
               </>
             ) : (
-              <span>PLACE ORDER</span>
+              <span className="whitespace-nowrap">PLACE ORDER</span>
             )}
           </button>
         </div>
