@@ -150,7 +150,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   const scrollIntoViewTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
     return () => {
       Object.values(removeTimersRef.current).forEach((id) =>
         window.clearTimeout(id)

@@ -14,7 +14,7 @@ export const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({
   onContinueShopping,
 }) => {
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
   const scrollToDetails = () => {

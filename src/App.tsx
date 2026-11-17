@@ -255,9 +255,9 @@ function AppContent() {
     const mode = pendingScrollModeRef.current;
     if (routeHash === '#/' && mode === 'restore') {
       const targetY = homeScrollYRef.current;
-      window.scrollTo({ top: targetY, behavior: 'auto' });
+      window.scrollTo({ top: targetY, behavior: 'instant' });
       window.requestAnimationFrame(() => {
-        window.scrollTo({ top: targetY, behavior: 'auto' });
+        window.scrollTo({ top: targetY, behavior: 'instant' });
       });
     } else if (routeHash === '#/' && mode === 'catalog') {
       window.setTimeout(() => {
@@ -267,7 +267,7 @@ function AppContent() {
         }
       }, 60);
     } else {
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [routeHash]);
 
