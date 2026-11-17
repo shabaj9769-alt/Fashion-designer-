@@ -1,6 +1,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import { TESTIMONIALS } from '../data/catalog';
+import { SmartImage } from './SmartImage';
 
 export const Testimonials: React.FC = () => {
   return (
@@ -10,16 +11,17 @@ export const Testimonials: React.FC = () => {
           <p className="text-[11px] font-medium uppercase tracking-[2px] text-[#c8a078] mb-2">
             PATRON NOTES
           </p>
-          <h2 className="text-[20px] sm:text-[24px] font-medium uppercase tracking-[1px] text-[#000000]">
+          <h2 className="aaroha-section-heading font-medium uppercase text-[#000000]">
             Worn Around The World
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+        {/* 3-col grid on desktop, horizontal swipe on mobile */}
+        <div className="aaroha-testimonials-track no-scrollbar">
           {TESTIMONIALS.map((item) => (
             <article
               key={item.id}
-              className="bg-white border border-[#e8e8e8] p-6 sm:p-8 flex flex-col justify-between"
+              className="aaroha-testimonial-card bg-white border border-[#e8e8e8] p-6 sm:p-8 flex flex-col justify-between"
             >
               <div>
                 <div
@@ -39,13 +41,28 @@ export const Testimonials: React.FC = () => {
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-[#e8e8e8]">
-                <p className="text-[12px] font-medium uppercase tracking-[1px] text-[#000000]">
-                  {item.name}
-                </p>
-                <p className="text-[11px] text-[#777777] mt-0.5">
-                  {item.city} · {item.outfitBought}
-                </p>
+              <div className="pt-4 border-t border-[#e8e8e8] flex items-center gap-3">
+                {item.avatar && (
+                  <div className="w-10 h-10 shrink-0 rounded-full overflow-hidden border border-[#e8e8e8] bg-[#f2f2f2]">
+                    <SmartImage
+                      src={item.avatar}
+                      alt={item.name}
+                      width={200}
+                      height={200}
+                      aspectRatio="1 / 1"
+                      className="w-full h-full object-cover"
+                      fallbackBg="linear-gradient(145deg, #f2ebe4 0%, #e4d8cc 100%)"
+                    />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-[12px] font-medium uppercase tracking-[1px] text-[#000000]">
+                    {item.name}
+                  </p>
+                  <p className="text-[11px] text-[#777777] mt-0.5">
+                    {item.city} · {item.outfitBought}
+                  </p>
+                </div>
               </div>
             </article>
           ))}

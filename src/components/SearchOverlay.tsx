@@ -136,7 +136,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({
                   : 'Curated Highlights'}
               </p>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pb-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pb-2">
                 {results.slice(0, 8).map((product) => (
                   <button
                     key={product.id}
@@ -145,19 +145,21 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({
                       onClose();
                       onSelectProduct(product);
                     }}
-                    className="group text-left border border-[#e8e8e8] bg-white hover:border-[#c8a078] transition-colors cursor-pointer"
+                    className="group min-w-0 overflow-hidden text-left border border-[#e8e8e8] bg-white hover:border-[#c8a078] transition-colors cursor-pointer"
                   >
                     <div className="aspect-[3/4] w-full overflow-hidden bg-[#f2f2f2]">
                       <SmartImage
                         src={product.primaryImage}
                         alt={product.title}
+                        width={600}
+                        height={800}
+                        aspectRatio="3 / 4"
                         className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                         fallbackBg={product.fallbackTone}
-                        fallbackLabel={product.title}
                       />
                     </div>
                     <div className="p-3">
-                      <p className="text-[12px] font-medium text-[#000000] group-hover:text-[#d74a5d] line-clamp-1">
+                      <p className="text-[12px] font-medium text-[#000000] group-hover:text-[#d74a5d] leading-[1.4] whitespace-normal [overflow-wrap:anywhere]">
                         {product.title}
                       </p>
                       <div className="mt-1 flex items-center gap-2 text-[12px] tabular-nums">

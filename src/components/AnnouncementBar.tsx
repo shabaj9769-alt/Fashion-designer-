@@ -34,7 +34,7 @@ export const AnnouncementBar: React.FC = () => {
 
         <p
           key={index}
-          className="text-[10px] sm:text-[11px] font-medium tracking-[1px] uppercase text-center truncate transition-opacity duration-300"
+          className="min-w-0 text-[10px] sm:text-[11px] font-medium tracking-[1px] uppercase text-center truncate transition-opacity duration-300"
         >
           {ANNOUNCEMENTS[index]}
         </p>

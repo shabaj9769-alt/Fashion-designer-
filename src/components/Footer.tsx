@@ -35,7 +35,7 @@ export const Footer: React.FC<FooterProps> = ({
 
   return (
     <footer className="bg-[#321004] text-white mt-auto">
-      <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-10 py-14 sm:py-16">
+      <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-10 pt-14 pb-24 sm:pt-16 sm:pb-24">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.55fr_0.8fr_1.05fr_1.2fr] gap-10 lg:gap-8">
           {/* Column 1: About + Newsletter */}
           <div>
@@ -67,11 +67,11 @@ export const Footer: React.FC<FooterProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="flex-1 min-w-0 bg-white/10 border border-white/25 px-3.5 py-2.5 text-[12px] text-white placeholder:text-white/55 focus:outline-none focus:border-[#c8a078]"
+                  className="flex-1 min-w-0 min-h-[44px] bg-white/10 border border-white/25 px-3.5 py-2.5 text-[12px] text-white placeholder:text-white/55 focus:outline-none focus:border-[#c8a078]"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2.5 bg-[#d74a5d] hover:bg-[#b8384a] text-white text-[11px] font-medium uppercase tracking-[1.2px] shrink-0 transition-colors cursor-pointer"
+                  className="min-h-[44px] px-4 py-2.5 bg-[#d74a5d] hover:bg-[#b8384a] text-white text-[11px] font-medium uppercase tracking-[1.2px] shrink-0 transition-colors cursor-pointer"
                 >
                   JOIN
                 </button>

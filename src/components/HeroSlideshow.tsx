@@ -26,95 +26,94 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
   const goNext = () =>
     setCurrent((prev) => (prev + 1) % HERO_SLIDES.length);
 
+  const activeSlide = HERO_SLIDES[current];
+
   return (
     <section
-      className="relative w-full overflow-hidden bg-[#321004]"
+      className="relative w-full overflow-hidden bg-[#321004] min-h-[480px] sm:min-h-[540px] lg:min-h-[620px] flex flex-col justify-end"
       aria-roledescription="carousel"
       aria-label="Featured seasonal campaigns"
     >
-      <div className="relative h-[460px] sm:h-[520px] lg:h-[620px] w-full">
-        {HERO_SLIDES.map((slide, idx) => {
-          const active = idx === current;
-          return (
-            <div
-              key={slide.id}
-              aria-hidden={!active}
-              className={`absolute inset-0 transition-opacity duration-700 ${
-                active ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-              }`}
+      {/* Image Layer: z-index 0 */}
+      <div className="absolute inset-0 z-0">
+        <div className="hidden sm:block w-full h-full">
+          <SmartImage
+            key={`${activeSlide.id}-desktop`}
+            src={activeSlide.desktopImage}
+            alt={activeSlide.title}
+            width={1600}
+            height={900}
+            loading="eager"
+            className="w-full h-full object-cover"
+            fallbackBg={activeSlide.fallbackBg}
+          />
+        </div>
+        <div className="block sm:hidden w-full h-full">
+          <SmartImage
+            key={`${activeSlide.id}-mobile`}
+            src={activeSlide.mobileImage}
+            alt={activeSlide.title}
+            width={800}
+            height={1067}
+            loading="eager"
+            className="w-full h-full object-cover"
+            fallbackBg={activeSlide.fallbackBg}
+          />
+        </div>
+      </div>
+
+      {/* Dark Gradient Scrim: rgba(50,16,4,0.55) to transparent */}
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          background:
+            'linear-gradient(to top, rgba(50, 16, 4, 0.72) 0%, rgba(50, 16, 4, 0.55) 45%, rgba(50, 16, 4, 0) 100%)',
+        }}
+      />
+
+      {/* Desktop Prev / Next Arrows */}
+      <button
+        type="button"
+        onClick={goPrev}
+        aria-label="Previous slide"
+        className="hidden lg:flex absolute left-4 top-1/2 -translate-y-1/2 z-[3] w-11 h-11 bg-white/85 hover:bg-white text-[#000000] items-center justify-center transition-colors cursor-pointer"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button
+        type="button"
+        onClick={goNext}
+        aria-label="Next slide"
+        className="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 z-[3] w-11 h-11 bg-white/85 hover:bg-white text-[#000000] items-center justify-center transition-colors cursor-pointer"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
+      {/* Single Normal-Flow Text & Controls Container: z-index 2, bottom padding 24px */}
+      <div className="relative z-[2] w-full max-w-[1440px] mx-auto px-5 sm:px-10 lg:px-14 pt-20 pb-[24px] flex flex-col gap-6">
+        <div className="max-w-xl text-white flex flex-col items-start gap-3">
+          <p className="text-[11px] font-medium uppercase tracking-[2px] text-[#dcb48c]">
+            {activeSlide.eyebrow}
+          </p>
+          <h1 className="aaroha-hero-heading font-normal uppercase text-white">
+            {activeSlide.title}
+          </h1>
+          <p className="text-[13px] sm:text-[15px] text-white/90 leading-relaxed max-w-md">
+            {activeSlide.subtitle}
+          </p>
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => onExploreFilter(activeSlide.filterKey)}
+              className="inline-flex items-center justify-center min-h-[46px] px-7 py-3 bg-[#d74a5d] hover:bg-[#b8384a] text-white text-[12px] font-medium uppercase tracking-[1.5px] transition-colors cursor-pointer"
             >
-              {/* Desktop image */}
-              <div className="hidden sm:block w-full h-full">
-                <SmartImage
-                  src={slide.desktopImage}
-                  alt={slide.title}
-                  className="w-full h-full object-cover"
-                  fallbackBg={slide.fallbackBg}
-                  fallbackLabel={slide.title}
-                  lightText
-                />
-              </div>
+              {activeSlide.ctaLabel}
+            </button>
+          </div>
+        </div>
 
-              {/* Mobile image */}
-              <div className="block sm:hidden w-full h-full">
-                <SmartImage
-                  src={slide.mobileImage}
-                  alt={slide.title}
-                  className="w-full h-full object-cover"
-                  fallbackBg={slide.fallbackBg}
-                  fallbackLabel={slide.title}
-                  lightText
-                />
-              </div>
-
-              {/* Contrast Scrim */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
-
-              {/* Left-bottom Overlay */}
-              <div className="absolute inset-0 max-w-[1440px] mx-auto px-5 sm:px-10 lg:px-14 flex items-end pb-14 sm:pb-16 lg:pb-20">
-                <div className="max-w-xl text-white">
-                  <p className="text-[11px] font-medium uppercase tracking-[2px] text-[#dcb48c] mb-2">
-                    {slide.eyebrow}
-                  </p>
-                  <h1 className="text-[28px] sm:text-[38px] lg:text-[46px] font-normal uppercase tracking-[1px] leading-[1.15] text-white mb-3">
-                    {slide.title}
-                  </h1>
-                  <p className="text-[13px] sm:text-[14px] text-white/90 leading-relaxed mb-6 max-w-md">
-                    {slide.subtitle}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => onExploreFilter(slide.filterKey)}
-                    className="inline-flex items-center justify-center px-7 py-3 bg-[#d74a5d] hover:bg-[#b8384a] text-white text-[12px] font-medium uppercase tracking-[1.5px] transition-colors cursor-pointer"
-                  >
-                    {slide.ctaLabel}
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-        {/* Prev / Next Arrows */}
-        <button
-          type="button"
-          onClick={goPrev}
-          aria-label="Previous slide"
-          className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/85 hover:bg-white text-[#000000] items-center justify-center transition-colors cursor-pointer"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <button
-          type="button"
-          onClick={goNext}
-          aria-label="Next slide"
-          className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/85 hover:bg-white text-[#000000] items-center justify-center transition-colors cursor-pointer"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-
-        {/* Bottom Controls: Dots + Autoplay Pause/Play */}
-        <div className="absolute bottom-4 left-0 right-0 z-20 max-w-[1440px] mx-auto px-5 sm:px-10 lg:px-14 flex items-center justify-between">
+        {/* Dots + Pause/Play Controls in Bottom-LEFT */}
+        <div className="flex items-center justify-start gap-3">
           <div className="flex items-center gap-2.5">
             {HERO_SLIDES.map((s, idx) => (
               <button
@@ -136,7 +135,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
             type="button"
             onClick={() => setIsPlaying((p) => !p)}
             aria-label={isPlaying ? 'Pause slideshow' : 'Play slideshow'}
-            className="w-9 h-9 bg-black/45 hover:bg-black/70 text-white border border-white/30 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-11 h-11 bg-black/45 hover:bg-black/70 text-white border border-white/30 flex items-center justify-center transition-colors cursor-pointer"
           >
             {isPlaying ? (
               <Pause className="w-3.5 h-3.5" />

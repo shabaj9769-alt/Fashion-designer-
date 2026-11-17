@@ -7,7 +7,7 @@ export const BrandStory: React.FC = () => {
         <p className="text-[11px] font-medium uppercase tracking-[2px] text-[#c8a078] mb-3">
           THE AAROHA ATELIER
         </p>
-        <h2 className="text-[20px] sm:text-[26px] font-medium uppercase tracking-[1px] text-[#000000] mb-5">
+        <h2 className="aaroha-section-heading font-medium uppercase text-[#000000] mb-5">
           SLOW-CRAFTED INDIAN HERITAGE FOR MODERN WARDROBES
         </h2>
         <p className="text-[14px] sm:text-[15px] text-[#343434] leading-[1.8]">

@@ -13,10 +13,15 @@
 }
 
 @layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
   html {
     font-family: 'Montserrat', sans-serif;
     scroll-behavior: smooth;
     overflow-x: hidden;
+    max-width: 100%;
   }
 
   body {
@@ -25,7 +30,13 @@
     color: var(--aaroha-body);
     background-color: var(--aaroha-bg);
     overflow-x: hidden;
+    max-width: 100%;
     -webkit-font-smoothing: antialiased;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -34,6 +45,187 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     text-wrap: balance;
+  }
+}
+
+/* Fluid typographic scale */
+.aaroha-hero-heading {
+  font-size: clamp(28px, 7vw, 52px);
+  line-height: 1.12;
+  letter-spacing: 1px;
+}
+
+.aaroha-section-heading {
+  font-size: clamp(20px, 3vw, 26px);
+  line-height: 1.25;
+  letter-spacing: 1px;
+}
+
+.aaroha-banner-heading {
+  font-size: clamp(28px, 6vw, 44px);
+  line-height: 1.1;
+  letter-spacing: 1px;
+}
+
+/* Header navigation visibility (supports phone "Desktop site" mode via touch check) */
+.aaroha-desktop-nav {
+  display: none;
+}
+.aaroha-mobile-hamburger {
+  display: inline-flex;
+}
+
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .aaroha-desktop-nav {
+    display: flex;
+  }
+  .aaroha-mobile-hamburger {
+    display: none;
+  }
+}
+
+/* Desktop slider vs Mobile 2-col product grid */
+.aaroha-products-track {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
+.aaroha-product-card {
+  flex: 0 0 calc(25% - 18px);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.aaroha-carousel-arrow {
+  display: flex;
+}
+
+@media (max-width: 1023px) {
+  .aaroha-product-card {
+    flex: 0 0 calc(33.333% - 16px);
+  }
+}
+
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .aaroha-products-track {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    overflow: visible;
+  }
+  .aaroha-product-card {
+    flex: initial;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .aaroha-carousel-arrow {
+    display: none;
+  }
+}
+
+/* Collection Banners 2-col desktop / 1-col mobile */
+.aaroha-banners-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+}
+
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .aaroha-banners-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Testimonials 3-col desktop / horizontal swipe mobile */
+.aaroha-testimonials-track {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .aaroha-testimonials-track {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding-bottom: 4px;
+  }
+  .aaroha-testimonial-card {
+    flex: 0 0 84%;
+    max-width: 340px;
+    scroll-snap-align: start;
+  }
+}
+
+/* Cart Drawer: max 420px desktop, full-screen 100vw x 100dvh mobile */
+.aaroha-cart-panel {
+  width: 100%;
+  max-width: 420px;
+  height: 100dvh;
+}
+
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .aaroha-cart-panel {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+  }
+}
+
+/* Quick View Modal: centered dialog desktop, full-width bottom sheet mobile */
+.aaroha-qv-backdrop {
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.aaroha-qv-panel {
+  width: 100%;
+  max-width: 896px;
+  max-height: 90dvh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.aaroha-qv-image-wrap {
+  aspect-ratio: 3 / 4;
+  width: 100%;
+}
+
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .aaroha-qv-backdrop {
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  .aaroha-qv-panel {
+    max-width: 100vw;
+    width: 100%;
+    max-height: 90dvh;
+    grid-template-columns: 1fr;
+  }
+  .aaroha-qv-image-wrap {
+    max-height: 45dvh;
+    aspect-ratio: auto;
+    height: 45dvh;
+  }
+}
+
+/* Hover second image only on true desktop hover pointers */
+.aaroha-hover-img {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .aaroha-hover-img {
+    display: block;
   }
 }
 

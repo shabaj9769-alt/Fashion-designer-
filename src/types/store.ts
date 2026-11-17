@@ -48,6 +48,7 @@ export interface FeaturedCategory {
 
 export interface CollectionBannerItem {
   id: string;
+  eyebrow?: string;
   title: string;
   subtitle: string;
   ctaLabel: string;
@@ -56,12 +57,15 @@ export interface CollectionBannerItem {
   fallbackBg: string;
 }
 
+export type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'title-asc';
+
 export interface TestimonialItem {
   id: string;
   name: string;
   city: string;
   review: string;
   outfitBought: string;
+  avatar?: string;
 }
 
 export interface MegaMenuColumn {

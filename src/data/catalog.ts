@@ -6,18 +6,18 @@ import {
   Product,
   TestimonialItem,
 } from '../types/store';
+import { IMAGES } from './images';
 
 export const ANNOUNCEMENTS: string[] = [
-  'FREE WORLDWIDE SHIPPING  ·  DUTIES PREPAID ON ALL INTERNATIONAL ORDERS',
-  'BUY 2 GET 5% OFF  ·  BUY 3 GET 10% OFF  ·  APPLIED AUTOMATICALLY IN CART',
+  'FREE WORLDWIDE SHIPPING  ·  BUY 2 GET 5% OFF, BUY 3+ GET 10% OFF AUTOMATICALLY',
+  'HANDCRAFTED MADE-TO-ORDER INDIAN ETHNIC WEAR  ·  COMPLIMENTARY CUSTOM SIZING',
 ];
 
 export const NAV_ITEMS: NavItem[] = [
   {
     label: 'SUIT SETS',
     filterKey: 'Suit Sets',
-    megaImage:
-      'https://placehold.co/500x680/ece4dc/321004?text=AAROHA%0ASUIT+SETS&font=montserrat',
+    megaImage: IMAGES.megaMenu.suitSets,
     columns: [
       {
         heading: 'Silhouettes',
@@ -41,8 +41,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     label: 'KIDS',
     filterKey: 'Kids',
-    megaImage:
-      'https://placehold.co/500x680/f2ebe4/321004?text=AAROHA%0AKIDS+EDIT&font=montserrat',
+    megaImage: IMAGES.megaMenu.kids,
     columns: [
       {
         heading: 'By Category',
@@ -56,8 +55,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     label: 'COLLECTIONS',
     filterKey: 'ALL',
-    megaImage:
-      'https://placehold.co/500x680/e8dfd6/321004?text=AAROHA%0ACOLLECTIONS&font=montserrat',
+    megaImage: IMAGES.megaMenu.collections,
     columns: [
       {
         heading: 'Seasonal Edits',
@@ -83,13 +81,11 @@ export const HERO_SLIDES: HeroSlide[] = [
     eyebrow: 'NEW ARRIVAL · 2026 EDIT',
     title: 'HANDWOVEN CHANDERI SILK',
     subtitle:
-      'Fluid silhouettes crafted in Jaipur ateliers with zari border accents and breathable lining.',
+      'Fluid silhouettes crafted in Jaipur ateliers with zari border accents and breathable cotton lining.',
     ctaLabel: 'SHOP SUIT SETS',
     filterKey: 'Suit Sets',
-    desktopImage:
-      'https://placehold.co/1600x760/321004/f5efe8?text=AAROHA+%C2%B7+HANDWOVEN+CHANDERI+EDIT&font=montserrat',
-    mobileImage:
-      'https://placehold.co/800x1100/321004/f5efe8?text=AAROHA%0ACHANDERI+EDIT&font=montserrat',
+    desktopImage: IMAGES.hero.slide1Desktop,
+    mobileImage: IMAGES.hero.slide1Mobile,
     fallbackBg: 'linear-gradient(135deg, #321004 0%, #5e2c1c 100%)',
   },
   {
@@ -100,10 +96,8 @@ export const HERO_SLIDES: HeroSlide[] = [
       'Featherlight hand-block prints and tonal threadwork tailored for warm days and effortless poise.',
     ctaLabel: 'EXPLORE KURTAS',
     filterKey: 'Kurtas',
-    desktopImage:
-      'https://placehold.co/1600x760/4a2e22/f7f2ec?text=AAROHA+%C2%B7+ARTISANAL+MULMUL+KURTAS&font=montserrat',
-    mobileImage:
-      'https://placehold.co/800x1100/4a2e22/f7f2ec?text=AAROHA%0AMULMUL+KURTAS&font=montserrat',
+    desktopImage: IMAGES.hero.slide2Desktop,
+    mobileImage: IMAGES.hero.slide2Mobile,
     fallbackBg: 'linear-gradient(135deg, #4a2e22 0%, #7d5442 100%)',
   },
   {
@@ -114,10 +108,8 @@ export const HERO_SLIDES: HeroSlide[] = [
       'Relaxed tailoring meets subtle gota and resham detailing for intimate gatherings and travel.',
     ctaLabel: 'DISCOVER CO-ORDS',
     filterKey: 'Co-ord Sets',
-    desktopImage:
-      'https://placehold.co/1600x760/5a3b2e/faf5ef?text=AAROHA+%C2%B7+CONTEMPORARY+CO-ORDS&font=montserrat',
-    mobileImage:
-      'https://placehold.co/800x1100/5a3b2e/faf5ef?text=AAROHA%0ACO-ORD+SETS&font=montserrat',
+    desktopImage: IMAGES.hero.slide3Desktop,
+    mobileImage: IMAGES.hero.slide3Mobile,
     fallbackBg: 'linear-gradient(135deg, #5a3b2e 0%, #8c624d 100%)',
   },
 ];
@@ -127,51 +119,45 @@ export const FEATURED_CATEGORIES: FeaturedCategory[] = [
     id: 'cat-suit-sets',
     name: 'Suit Sets',
     filterKey: 'Suit Sets',
-    image:
-      'https://placehold.co/600x750/f2ebe4/321004?text=SUIT+SETS&font=montserrat',
-    fallbackTone: '#f2ebe4',
+    image: IMAGES.featuredCollections.suitSets,
+    fallbackTone: 'linear-gradient(145deg, #f2f2f2 0%, #e8e8e8 100%)',
   },
   {
     id: 'cat-kurtas',
     name: 'Kurtas',
     filterKey: 'Kurtas',
-    image:
-      'https://placehold.co/600x750/ece6df/321004?text=KURTAS&font=montserrat',
-    fallbackTone: '#ece6df',
+    image: IMAGES.featuredCollections.kurtas,
+    fallbackTone: 'linear-gradient(145deg, #f2f2f2 0%, #e8e8e8 100%)',
   },
   {
     id: 'cat-coords',
     name: 'Co-ord Sets',
     filterKey: 'Co-ord Sets',
-    image:
-      'https://placehold.co/600x750/f5efe8/321004?text=CO-ORD+SETS&font=montserrat',
-    fallbackTone: '#f5efe8',
+    image: IMAGES.featuredCollections.coordSets,
+    fallbackTone: 'linear-gradient(145deg, #f2f2f2 0%, #e8e8e8 100%)',
   },
   {
     id: 'cat-kids',
     name: 'Kids',
     filterKey: 'Kids',
-    image:
-      'https://placehold.co/600x750/eae3da/321004?text=KIDS&font=montserrat',
-    fallbackTone: '#eae3da',
+    image: IMAGES.featuredCollections.kids,
+    fallbackTone: 'linear-gradient(145deg, #f2f2f2 0%, #e8e8e8 100%)',
   },
 ];
 
 export const PRODUCTS: Product[] = [
   {
     id: 'aar-101',
-    title: 'Meher Ivory Chanderi Straight Suit Set',
+    title: 'Meher Ivory Chanderi Straight Suit',
     category: 'Suit Sets',
     subCategory: 'Straight',
     collectionTags: ['Festive', 'Spring Summer'],
     regularPrice: 165,
     salePrice: 129,
     onSale: true,
-    primaryImage:
-      'https://placehold.co/600x800/f4efe9/321004?text=MEHER+IVORY%0ASTRAIGHT+SUIT&font=montserrat',
-    secondaryImage:
-      'https://placehold.co/600x800/e9e0d5/321004?text=MEHER+IVORY%0ADETAIL+VIEW&font=montserrat',
-    fallbackTone: '#f4efe9',
+    primaryImage: IMAGES.products.aar101Primary,
+    secondaryImage: IMAGES.products.aar101Hover,
+    fallbackTone: 'linear-gradient(145deg, #f4efe9 0%, #e7ddd1 100%)',
     fabric: 'Pure Chanderi Silk · Cotton Mulmul Lining',
     description:
       'Ivory straight-cut kurta finished with delicate antique gold zardozi around the neckline, paired with tapered trousers and a scalloped organza dupatta.',
@@ -187,11 +173,9 @@ export const PRODUCTS: Product[] = [
     regularPrice: 210,
     salePrice: 158,
     onSale: true,
-    primaryImage:
-      'https://placehold.co/600x800/f6ecef/321004?text=RUHANI+ROSE%0AANARKALI+SET&font=montserrat',
-    secondaryImage:
-      'https://placehold.co/600x800/ebd9df/321004?text=RUHANI+ROSE%0ABACK+DRAPE&font=montserrat',
-    fallbackTone: '#f6ecef',
+    primaryImage: IMAGES.products.aar102Primary,
+    secondaryImage: IMAGES.products.aar102Hover,
+    fallbackTone: 'linear-gradient(145deg, #f6ecef 0%, #e8d5dc 100%)',
     fabric: 'Silk Organza · Shantoon Underskirt',
     description:
       'Sixteen-panel flared Anarkali in muted tea rose accented with tonal resham florals, matched with churidar trousers and a sheer gossamer dupatta.',
@@ -200,18 +184,16 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'aar-103',
-    title: 'Tara Sage Block-Print Flared Kurta Set',
+    title: 'Tara Sage Block-Print Flared Suit',
     category: 'Suit Sets',
     subCategory: 'Flared',
     collectionTags: ['Spring Summer', 'Work Wear'],
     regularPrice: 145,
     salePrice: 109,
     onSale: true,
-    primaryImage:
-      'https://placehold.co/600x800/eaeeea/321004?text=TARA+SAGE%0AFLARED+SUIT&font=montserrat',
-    secondaryImage:
-      'https://placehold.co/600x800/dce4dc/321004?text=TARA+SAGE%0APATTERN+VIEW&font=montserrat',
-    fallbackTone: '#eaeeea',
+    primaryImage: IMAGES.products.aar103Primary,
+    secondaryImage: IMAGES.products.aar103Hover,
+    fallbackTone: 'linear-gradient(145deg, #eaeeea 0%, #d8e2d8 100%)',
     fabric: 'Handspun Cotton Mulmul',
     description:
       'Breezy sage green flared silhouette hand-stamped by Bagru artisans, completed with wide-leg palazzos and a contrast doria dupatta.',
@@ -220,18 +202,16 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'aar-104',
-    title: 'Noor Sand Silk A-Line Suit Set',
+    title: 'Noor Sand Silk A-Line Suit',
     category: 'Suit Sets',
     subCategory: 'A-Line',
     collectionTags: ['Festive', 'Work Wear'],
     regularPrice: 178,
     salePrice: 138,
     onSale: true,
-    primaryImage:
-      'https://placehold.co/600x800/f1e9df/321004?text=NOOR+SAND%0AA-LINE+SUIT&font=montserrat',
-    secondaryImage:
-      'https://placehold.co/600x800/e5d8c8/321004?text=NOOR+SAND%0ACLOSEUP&font=montserrat',
-    fallbackTone: '#f1e9df',
+    primaryImage: IMAGES.products.aar104Primary,
+    secondaryImage: IMAGES.products.aar104Hover,
+    fallbackTone: 'linear-gradient(145deg, #f1e9df 0%, #e2d4c4 100%)',
     fabric: 'Tussar Silk Blend · Pure Cotton Lining',
     description:
       'Warm sandstone A-line kurta with minimalist pintucks and subtle mirror-stitch cuffs, styled with straight pants and a woven Banarasi stole.',
@@ -247,11 +227,9 @@ export const PRODUCTS: Product[] = [
     regularPrice: 92,
     salePrice: 68,
     onSale: true,
-    primaryImage:
-      'https://placehold.co/600x800/e8ecf1/321004?text=KAVERI+INDIGO%0AHANDLOOM+KURTA&font=montserrat',
-    secondaryImage:
-      'https://placehold.co/600x800/d9e0e8/321004?text=KAVERI+INDIGO%0ASLEEVE+DETAIL&font=montserrat',
-    fallbackTone: '#e8ecf1',
+    primaryImage: IMAGES.products.aar105Primary,
+    secondaryImage: IMAGES.products.aar105Hover,
+    fallbackTone: 'linear-gradient(145deg, #e8ecf1 0%, #d5dde7 100%)',
     fabric: 'Handwoven Slub Cotton',
     description:
       'Natural indigo straight kurta featuring hand-embroidered kantha stitches along the placket and side pockets for effortless workday comfort.',
@@ -267,11 +245,9 @@ export const PRODUCTS: Product[] = [
     regularPrice: 128,
     salePrice: 96,
     onSale: true,
-    primaryImage:
-      'https://placehold.co/600x800/f3e6e1/321004?text=ZOYA+TERRACOTTA%0ACO-ORD+SET&font=montserrat',
-    secondaryImage:
-      'https://placehold.co/600x800/e8d4cc/321004?text=ZOYA+TERRACOTTA%0ADETAIL+VIEW&font=montserrat',
-    fallbackTone: '#f3e6e1',
+    primaryImage: IMAGES.products.aar106Primary,
+    secondaryImage: IMAGES.products.aar106Hover,
+    fallbackTone: 'linear-gradient(145deg, #f3e6e1 0%, #e5cfc6 100%)',
     fabric: 'Breathable Cotton Linen',
     description:
       'Relaxed tunic with shell buttons and geometric French knot embroidery, paired with ankle-grazing relaxed trousers.',
@@ -280,18 +256,16 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'aar-107',
-    title: 'Aanya Marigold Girls Festive Sharara Set',
+    title: 'Aanya Marigold Girls Sharara',
     category: 'Kids',
     subCategory: 'Girls',
     collectionTags: ['Festive', 'Spring Summer'],
     regularPrice: 88,
     salePrice: 64,
     onSale: true,
-    primaryImage:
-      'https://placehold.co/600x800/f7efdf/321004?text=AANYA+MARIGOLD%0AGIRLS+SHARARA&font=montserrat',
-    secondaryImage:
-      'https://placehold.co/600x800/eee0c5/321004?text=AANYA+MARIGOLD%0AFESTIVE+VIEW&font=montserrat',
-    fallbackTone: '#f7efdf',
+    primaryImage: IMAGES.products.aar107Primary,
+    secondaryImage: IMAGES.products.aar107Hover,
+    fallbackTone: 'linear-gradient(145deg, #f7efdf 0%, #ecdcbe 100%)',
     fabric: 'Soft Chanderi & Mulmul Lining',
     description:
       'Skin-friendly marigold short kurti with gentle gota trim, flared sharara pants, and a lightweight netted dupatta designed for young celebrations.',
@@ -307,11 +281,9 @@ export const PRODUCTS: Product[] = [
     regularPrice: 82,
     salePrice: 59,
     onSale: true,
-    primaryImage:
-      'https://placehold.co/600x800/efece8/321004?text=VIHAAN+IVORY%0ABOYS+KURTA+SET&font=montserrat',
-    secondaryImage:
-      'https://placehold.co/600x800/e3ded7/321004?text=VIHAAN+IVORY%0AEMBROIDERY&font=montserrat',
-    fallbackTone: '#efece8',
+    primaryImage: IMAGES.products.aar108Primary,
+    secondaryImage: IMAGES.products.aar108Hover,
+    fallbackTone: 'linear-gradient(145deg, #efece8 0%, #dfd9d0 100%)',
     fabric: 'Cotton Silk Blend',
     description:
       'Crisp ivory kurta with subtle mandarin collar threadwork paired with soft elasticated churidar pyjama for all-day comfort.',
@@ -327,11 +299,9 @@ export const PRODUCTS: Product[] = [
     regularPrice: 195,
     salePrice: 149,
     onSale: true,
-    primaryImage:
-      'https://placehold.co/600x800/ede5ea/321004?text=IRA+PLUM%0AWINTER+SET&font=montserrat',
-    secondaryImage:
-      'https://placehold.co/600x800/dfd2da/321004?text=IRA+PLUM%0AZARI+DETAIL&font=montserrat',
-    fallbackTone: '#ede5ea',
+    primaryImage: IMAGES.products.aar109Primary,
+    secondaryImage: IMAGES.products.aar109Hover,
+    fallbackTone: 'linear-gradient(145deg, #ede5ea 0%, #dcd0d7 100%)',
     fabric: 'Micro Silk Velvet · Organza Dupatta',
     description:
       'Plum micro-velvet straight kurta with delicate antique dori embroidery at the yoke and cuffs, paired with matching velvet pants.',
@@ -347,15 +317,121 @@ export const PRODUCTS: Product[] = [
     regularPrice: 98,
     salePrice: 74,
     onSale: true,
-    primaryImage:
-      'https://placehold.co/600x800/f3f1ee/321004?text=SANA+PEARL%0ACHIKANKARI+KURTA&font=montserrat',
-    secondaryImage:
-      'https://placehold.co/600x800/e7e4df/321004?text=SANA+PEARL%0ASTITCH+DETAIL&font=montserrat',
-    fallbackTone: '#f3f1ee',
+    primaryImage: IMAGES.products.aar110Primary,
+    secondaryImage: IMAGES.products.aar110Hover,
+    fallbackTone: 'linear-gradient(145deg, #f3f1ee 0%, #e3e0da 100%)',
     fabric: 'Breathable Mulmul Voile',
     description:
       'Hand-done Lucknowi shadow-work chikankari on pearl-white mulmul, cut in an easy straight drape for warm afternoons.',
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    dispatchDays: 'Made to order in 5–7 business days',
+  },
+  {
+    id: 'aar-111',
+    title: 'Kavya Saffron Gota Patti Anarkali Suit',
+    category: 'Suit Sets',
+    subCategory: 'Anarkali',
+    collectionTags: ['Festive', 'Spring Summer'],
+    regularPrice: 225,
+    salePrice: 175,
+    onSale: true,
+    primaryImage: IMAGES.products.aar111Primary,
+    secondaryImage: IMAGES.products.aar111Hover,
+    fallbackTone: 'linear-gradient(145deg, #f6ece0 0%, #e9d6be 100%)',
+    fabric: 'Pure Maheshwari Silk · Organza Dupatta',
+    description:
+      'Sunlit saffron flared Anarkali embellished with traditional Rajasthani gota patti borders and gossamer zari edging.',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'Custom'],
+    dispatchDays: 'Made to order in 8–12 business days',
+  },
+  {
+    id: 'aar-112',
+    title: 'Diya Emerald Modal Silk Co-ord Set',
+    category: 'Co-ord Sets',
+    subCategory: 'Festive',
+    collectionTags: ['Festive', 'Autumn Winter'],
+    regularPrice: 152,
+    salePrice: 118,
+    onSale: true,
+    primaryImage: IMAGES.products.aar112Primary,
+    secondaryImage: IMAGES.products.aar112Hover,
+    fallbackTone: 'linear-gradient(145deg, #e5edea 0%, #d1ded9 100%)',
+    fabric: 'Ajrakh Modal Silk',
+    description:
+      'Jewel-toned modal silk tunic with hand-beaded neckline tassels and fluid straight-cut culottes for evening hosting.',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'Custom'],
+    dispatchDays: 'Made to order in 6–9 business days',
+  },
+  {
+    id: 'aar-113',
+    title: 'Nandini Oat Khadi Pintuck Kurta',
+    category: 'Kurtas',
+    subCategory: 'Work Wear',
+    collectionTags: ['Work Wear', 'Autumn Winter'],
+    regularPrice: 86,
+    salePrice: 86,
+    onSale: false,
+    primaryImage: IMAGES.products.aar113Primary,
+    secondaryImage: IMAGES.products.aar113Hover,
+    fallbackTone: 'linear-gradient(145deg, #f2ede6 0%, #e4dcd0 100%)',
+    fabric: 'Hand-Spun Bengal Khadi',
+    description:
+      'Textured oatmeal khadi kurta featuring vertical bodice pintucks, wooden buttons, and deep utility pockets for studio days.',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    dispatchDays: 'Made to order in 4–6 business days',
+  },
+  {
+    id: 'aar-114',
+    title: 'Meera Coral Kalamkari A-Line Suit',
+    category: 'Suit Sets',
+    subCategory: 'A-Line',
+    collectionTags: ['Spring Summer', 'Festive'],
+    regularPrice: 168,
+    salePrice: 132,
+    onSale: true,
+    primaryImage: IMAGES.products.aar114Primary,
+    secondaryImage: IMAGES.products.aar114Hover,
+    fallbackTone: 'linear-gradient(145deg, #f7eae6 0%, #ead3cc 100%)',
+    fabric: 'Cotton Silk · Hand-Painted Kalamkari',
+    description:
+      'Muted coral A-line kurta showcasing botanical kalamkari motifs, styled with ivory cotton pants and a sheer kota doria dupatta.',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'Custom'],
+    dispatchDays: 'Made to order in 7–10 business days',
+  },
+  {
+    id: 'aar-115',
+    title: 'Rhea Mist Grey Mulmul Co-ord Set',
+    category: 'Co-ord Sets',
+    subCategory: 'Work Wear',
+    collectionTags: ['Work Wear', 'Spring Summer'],
+    regularPrice: 118,
+    salePrice: 118,
+    onSale: false,
+    primaryImage: IMAGES.products.aar115Primary,
+    secondaryImage: IMAGES.products.aar115Hover,
+    fallbackTone: 'linear-gradient(145deg, #eceeef 0%, #dcdfe2 100%)',
+    fabric: 'Double-Layer Cotton Mulmul',
+    description:
+      'Minimalist dove-grey collared tunic with tonal French knots and relaxed cropped trousers designed for travel and work.',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    dispatchDays: 'Made to order in 5–7 business days',
+  },
+  {
+    id: 'aar-116',
+    title: 'Arjun Sage Bandhgala Boys Kurta Set',
+    category: 'Kids',
+    subCategory: 'Boys',
+    collectionTags: ['Festive', 'Spring Summer'],
+    regularPrice: 94,
+    salePrice: 72,
+    onSale: true,
+    primaryImage: IMAGES.products.aar116Primary,
+    secondaryImage: IMAGES.products.aar116Hover,
+    fallbackTone: 'linear-gradient(145deg, #eaeee9 0%, #d8dfd6 100%)',
+    fabric: 'Breathable Cotton Linen Blend',
+    description:
+      'Soft sage Nehru-inspired waistcoat layered over an ivory mulmul kurta and drawstring pyjama for joyful family celebrations.',
+    sizes: ['XS', 'S', 'M', 'L', 'Custom'],
     dispatchDays: 'Made to order in 5–7 business days',
   },
 ];
@@ -363,22 +439,22 @@ export const PRODUCTS: Product[] = [
 export const COLLECTION_BANNERS: CollectionBannerItem[] = [
   {
     id: 'banner-festive',
+    eyebrow: 'CELEBRATION EDIT',
     title: 'FESTIVE',
     subtitle: 'Hand-embellished silks & heirloom silhouettes for celebratory evenings.',
     ctaLabel: 'SHOP NOW',
     filterKey: 'Festive',
-    image:
-      'https://placehold.co/900x1050/3d1c10/f6efe8?text=AAROHA+%C2%B7+FESTIVE+COLLECTION&font=montserrat',
+    image: IMAGES.collectionBanners.festive,
     fallbackBg: 'linear-gradient(160deg, #3d1c10 0%, #6b3420 100%)',
   },
   {
     id: 'banner-workwear',
+    eyebrow: 'EVERYDAY TAILORING',
     title: 'WORK WEAR',
     subtitle: 'Tailored handloom kurtas & breathable co-ords built for daily ease.',
     ctaLabel: 'SHOP NOW',
     filterKey: 'Work Wear',
-    image:
-      'https://placehold.co/900x1050/4f382e/f7f3ee?text=AAROHA+%C2%B7+WORK+WEAR+EDIT&font=montserrat',
+    image: IMAGES.collectionBanners.workWear,
     fallbackBg: 'linear-gradient(160deg, #4f382e 0%, #7d5d4e 100%)',
   },
 ];
@@ -390,15 +466,17 @@ export const TESTIMONIALS: TestimonialItem[] = [
     city: 'Austin, USA',
     review:
       'Ordered the Meher Chanderi suit with custom sleeve and length notes. The cotton mulmul lining feels whisper-soft and the finish looks bespoke.',
-    outfitBought: 'Meher Ivory Chanderi Straight Suit Set',
+    outfitBought: 'Meher Ivory Chanderi Straight Suit',
+    avatar: IMAGES.testimonials.patron1,
   },
   {
     id: 'rev-2',
     name: 'Meera Krishnan',
     city: 'London, UK',
     review:
-      'Shipping arrived in nine days with zero extra customs hassle. The sage block-print flared kurta kept its crisp drape all day at a family brunch.',
-    outfitBought: 'Tara Sage Block-Print Flared Kurta Set',
+      'Shipping arrived in nine days with zero extra customs hassle. The sage block-print flared suit kept its crisp drape all day at a family brunch.',
+    outfitBought: 'Tara Sage Block-Print Flared Suit',
+    avatar: IMAGES.testimonials.patron2,
   },
   {
     id: 'rev-3',
@@ -406,6 +484,7 @@ export const TESTIMONIALS: TestimonialItem[] = [
     city: 'Bengaluru, India',
     review:
       'Bought matching outfits for myself and my daughter. Subtle embroidery, neat inner seams, and true-to-measure fitting without any alterations.',
-    outfitBought: 'Aanya Marigold Girls Festive Sharara Set',
+    outfitBought: 'Aanya Marigold Girls Sharara',
+    avatar: IMAGES.testimonials.patron3,
   },
 ];

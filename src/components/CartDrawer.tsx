@@ -86,9 +86,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     >
       <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
 
-      <div className="relative z-10 w-full sm:max-w-[440px] bg-white h-full flex flex-col shadow-2xl">
-        {/* Top Bar */}
-        <div className="px-5 py-4 border-b border-[#e8e8e8] flex items-center justify-between">
+      <div className="aaroha-cart-panel relative z-10 bg-white flex flex-col shadow-2xl overflow-hidden">
+        {/* Top Bar (fixed header) */}
+        <div className="shrink-0 px-5 py-4 border-b border-[#e8e8e8] flex items-center justify-between bg-white">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-4 h-4 text-[#321004]" />
             <h2 className="text-[14px] font-medium uppercase tracking-[1.2px] text-[#000000]">
@@ -99,7 +99,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             type="button"
             onClick={handleClose}
             aria-label="Close shopping bag"
-            className="p-1.5 text-[#343434] hover:text-[#d74a5d] cursor-pointer"
+            className="w-11 h-11 -mr-2 flex items-center justify-center text-[#343434] hover:text-[#d74a5d] cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -107,7 +107,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
         {/* Free Shipping & Multi-Buy Discount Progress Bar */}
         {checkoutStep !== 'done' && (
-          <div className="px-5 py-3.5 bg-[#f2f2f2] border-b border-[#e8e8e8]">
+          <div className="shrink-0 px-5 py-3.5 bg-[#f2f2f2] border-b border-[#e8e8e8]">
             <div className="flex items-start gap-2 mb-2">
               <Truck className="w-4 h-4 text-[#321004] shrink-0 mt-0.5" />
               <p className="text-[11px] font-medium text-[#321004] leading-snug">
@@ -135,7 +135,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         )}
 
         {/* Drawer Body */}
-        <div className="flex-1 overflow-y-auto px-5 py-5">
+        <div className="flex-1 min-h-0 overflow-y-auto px-5 py-5">
           {checkoutStep === 'done' ? (
             <div className="h-full flex flex-col items-center justify-center text-center py-8 px-4">
               <CheckCircle2 className="w-11 h-11 text-[#321004] mb-4 stroke-[1.5]" />
@@ -234,10 +234,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             <div className="divide-y divide-[#e8e8e8]">
               {items.map((item) => (
                 <div key={item.key} className="py-4 first:pt-0 flex gap-3.5">
-                  <div className="w-20 aspect-[3/4] shrink-0 bg-[#f2f2f2] border border-[#e8e8e8] overflow-hidden">
+                  <div className="w-[80px] h-[100px] shrink-0 bg-[#f2f2f2] border border-[#e8e8e8] overflow-hidden">
                     <SmartImage
                       src={item.product.primaryImage}
                       alt={item.product.title}
+                      width={80}
+                      height={100}
                       className="w-full h-full object-cover"
                       fallbackBg={item.product.fallbackTone}
                     />
@@ -305,9 +307,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           )}
         </div>
 
-        {/* Footer Totals & CTA */}
+        {/* Sticky Footer Totals & CTA */}
         {items.length > 0 && checkoutStep !== 'done' && (
-          <div className="p-5 bg-white border-t border-[#e8e8e8] space-y-3">
+          <div className="sticky bottom-0 shrink-0 p-5 bg-white border-t border-[#e8e8e8] space-y-3">
             <div className="space-y-1.5 text-[12px] tabular-nums">
               <div className="flex justify-between text-[#343434]">
                 <span>Subtotal</span>
@@ -341,7 +343,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <button
                 type="button"
                 onClick={() => setCheckoutStep('confirm')}
-                className="w-full py-3.5 bg-[#d74a5d] hover:bg-[#321004] text-white text-[12px] font-medium uppercase tracking-[1.5px] transition-colors cursor-pointer"
+                className="w-full min-h-[46px] py-3.5 bg-[#d74a5d] hover:bg-[#321004] text-white text-[12px] font-medium uppercase tracking-[1.5px] transition-colors cursor-pointer"
               >
                 PROCEED TO CHECKOUT
               </button>
@@ -349,7 +351,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <button
                 type="submit"
                 form="checkout-form"
-                className="w-full py-3.5 bg-[#321004] hover:bg-[#d74a5d] text-white text-[12px] font-medium uppercase tracking-[1.5px] transition-colors cursor-pointer"
+                className="w-full min-h-[46px] py-3.5 bg-[#321004] hover:bg-[#d74a5d] text-white text-[12px] font-medium uppercase tracking-[1.5px] transition-colors cursor-pointer"
               >
                 COMPLETE ORDER · ${finalTotal.toFixed(2)}
               </button>

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { PRODUCTS } from './data/catalog';
-import { CartItem, Product, SizeOption } from './types/store';
+import { CartItem, Product, SizeOption, SortOption } from './types/store';
 import { AnnouncementBar } from './components/AnnouncementBar';
 import { Header } from './components/Header';
 import { HeroSlideshow } from './components/HeroSlideshow';
@@ -21,14 +21,37 @@ import { WhatsAppButton } from './components/WhatsAppButton';
 
 export default function App() {
   const [activeFilter, setActiveFilter] = useState<string>('ALL');
+  const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [guideTopic, setGuideTopic] = useState<
     'Made to Order' | 'Custom Sizing' | null
   >(null);
+
+  const anyOverlayOpen =
+    mobileMenuOpen ||
+    cartOpen ||
+    searchOpen ||
+    accountOpen ||
+    Boolean(quickViewProduct) ||
+    Boolean(guideTopic);
+
+  // Lock background page scroll while drawers, menus, or modals are open
+  useEffect(() => {
+    if (!anyOverlayOpen) {
+      document.body.style.overflow = '';
+      return;
+    }
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [anyOverlayOpen]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -37,6 +60,7 @@ export default function App() {
         setSearchOpen(false);
         setCartOpen(false);
         setAccountOpen(false);
+        setMobileMenuOpen(false);
         setGuideTopic(null);
       }
     };
@@ -45,24 +69,38 @@ export default function App() {
   }, []);
 
   const filteredProducts = useMemo(() => {
-    if (activeFilter === 'ALL') return PRODUCTS;
-    if (activeFilter === 'SALE') return PRODUCTS.filter((p) => p.onSale);
+    const base =
+      activeFilter === 'ALL'
+        ? PRODUCTS
+        : activeFilter === 'SALE'
+        ? PRODUCTS.filter((p) => p.onSale)
+        : PRODUCTS.filter(
+            (p) =>
+              p.category.toLowerCase() === activeFilter.toLowerCase() ||
+              p.subCategory.toLowerCase() === activeFilter.toLowerCase() ||
+              p.collectionTags.some(
+                (tag) => tag.toLowerCase() === activeFilter.toLowerCase()
+              )
+          );
 
-    return PRODUCTS.filter(
-      (p) =>
-        p.category.toLowerCase() === activeFilter.toLowerCase() ||
-        p.subCategory.toLowerCase() === activeFilter.toLowerCase() ||
-        p.collectionTags.some(
-          (tag) => tag.toLowerCase() === activeFilter.toLowerCase()
-        )
-    );
-  }, [activeFilter]);
+    const sorted = [...base];
+    if (sortBy === 'price-asc') {
+      sorted.sort((a, b) => a.salePrice - b.salePrice);
+    } else if (sortBy === 'price-desc') {
+      sorted.sort((a, b) => b.salePrice - a.salePrice);
+    } else if (sortBy === 'title-asc') {
+      sorted.sort((a, b) => a.title.localeCompare(b.title));
+    }
+    return sorted;
+  }, [activeFilter, sortBy]);
 
-  const handleSelectFilter = (filterKey: string) => {
+  const handleSelectFilter = (filterKey: string, scroll = true) => {
     setActiveFilter(filterKey);
-    const section = document.getElementById('recommended-products');
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (scroll) {
+      const section = document.getElementById('recommended-products');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 
@@ -117,7 +155,9 @@ export default function App() {
       <Header
         cartCount={cartCount}
         activeFilter={activeFilter}
-        onSelectFilter={handleSelectFilter}
+        mobileDrawerOpen={mobileMenuOpen}
+        onMobileDrawerOpenChange={setMobileMenuOpen}
+        onSelectFilter={(key) => handleSelectFilter(key, true)}
         onOpenCart={() => setCartOpen(true)}
         onOpenSearch={() => setSearchOpen(true)}
         onOpenAccount={() => setAccountOpen(true)}
@@ -125,21 +165,27 @@ export default function App() {
 
       <main className="flex-1">
         {/* Section 3: Full-Width Slideshow */}
-        <HeroSlideshow onExploreFilter={handleSelectFilter} />
+        <HeroSlideshow onExploreFilter={(key) => handleSelectFilter(key, true)} />
 
         {/* Section 4: Featured Collections */}
-        <FeaturedCollections onSelectCategory={handleSelectFilter} />
+        <FeaturedCollections
+          onSelectCategory={(key) => handleSelectFilter(key, true)}
+        />
 
-        {/* Section 5: Recommended For You Product Slider / Mobile 2-Col Grid */}
+        {/* Section 5: Recommended For You Product Slider / Mobile 2-Col Grid + Filter/Sort */}
         <RecommendedProducts
           products={filteredProducts}
           activeFilter={activeFilter}
-          onResetFilter={() => setActiveFilter('ALL')}
+          sortBy={sortBy}
+          onSelectFilter={(key) => handleSelectFilter(key, false)}
+          onChangeSort={setSortBy}
           onOpenQuickView={(product) => setQuickViewProduct(product)}
         />
 
         {/* Section 6: Collection Banner Section (Festive & Work Wear) */}
-        <CollectionBanners onSelectCollection={handleSelectFilter} />
+        <CollectionBanners
+          onSelectCollection={(key) => handleSelectFilter(key, true)}
+        />
 
         {/* Section 7: Rich Text Brand Story Section */}
         <BrandStory />
@@ -156,13 +202,13 @@ export default function App() {
 
       {/* Section 11: Dark Brown Footer */}
       <Footer
-        onSelectFilter={handleSelectFilter}
+        onSelectFilter={(key) => handleSelectFilter(key, true)}
         onOpenCustomGuide={(topic) => setGuideTopic(topic)}
         onOpenAccount={() => setAccountOpen(true)}
       />
 
       {/* Interactive Overlays, Drawers & WhatsApp Floating Button */}
-      <WhatsAppButton />
+      <WhatsAppButton hidden={anyOverlayOpen} />
 
       <CartDrawer
         open={cartOpen}
@@ -177,7 +223,7 @@ export default function App() {
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
         onSelectProduct={(product) => setQuickViewProduct(product)}
-        onSelectFilter={handleSelectFilter}
+        onSelectFilter={(key) => handleSelectFilter(key, true)}
       />
 
       <QuickViewModal

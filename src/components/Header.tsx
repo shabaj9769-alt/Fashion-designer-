@@ -14,6 +14,8 @@ import { SmartImage } from './SmartImage';
 interface HeaderProps {
   cartCount: number;
   activeFilter: string;
+  mobileDrawerOpen: boolean;
+  onMobileDrawerOpenChange: (open: boolean) => void;
   onSelectFilter: (filterKey: string) => void;
   onOpenCart: () => void;
   onOpenSearch: () => void;
@@ -23,13 +25,14 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   cartCount,
   activeFilter,
+  mobileDrawerOpen,
+  onMobileDrawerOpenChange,
   onSelectFilter,
   onOpenCart,
   onOpenSearch,
   onOpenAccount,
 }) => {
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [expandedMobileGroup, setExpandedMobileGroup] = useState<string | null>(
     null
   );
@@ -37,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
   const handleNavClick = (filterKey: string) => {
     onSelectFilter(filterKey);
     setHoveredMenu(null);
-    setMobileDrawerOpen(false);
+    onMobileDrawerOpenChange(false);
   };
 
   const activeMegaItem = NAV_ITEMS.find(
@@ -50,21 +53,21 @@ export const Header: React.FC<HeaderProps> = ({
         className="sticky top-0 z-40 bg-white border-b border-[#e8e8e8]"
         onMouseLeave={() => setHoveredMenu(null)}
       >
-        <div className="max-w-[1440px] mx-auto px-4 lg:px-8 h-16 lg:h-[72px] grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+        <div className="max-w-[1440px] mx-auto px-4 lg:px-8 h-16 lg:h-[72px] grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
           {/* Left Zone: Hamburger on mobile, Nav Links on desktop */}
           <div className="flex items-center justify-start min-w-0">
             <button
               type="button"
-              onClick={() => setMobileDrawerOpen(true)}
+              onClick={() => onMobileDrawerOpenChange(true)}
               aria-label="Open navigation menu"
-              className="lg:hidden -ml-2 p-2.5 text-[#000000] hover:text-[#d74a5d] transition-colors"
+              className="aaroha-mobile-hamburger -ml-2 p-2.5 text-[#000000] hover:text-[#d74a5d] transition-colors items-center justify-center min-w-[44px] min-h-[44px]"
             >
               <Menu className="w-5 h-5 stroke-[1.6]" />
             </button>
 
             <nav
               aria-label="Primary navigation"
-              className="hidden lg:flex items-center gap-3.5 xl:gap-5"
+              className="aaroha-desktop-nav items-center gap-3.5 xl:gap-5"
             >
               {NAV_ITEMS.map((item) => {
                 const isActive = activeFilter === item.filterKey;
@@ -110,19 +113,19 @@ export const Header: React.FC<HeaderProps> = ({
                 onSelectFilter('ALL');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="text-[20px] sm:text-[24px] font-medium uppercase tracking-[4px] text-[#000000] whitespace-nowrap shrink-0 select-none"
+              className="text-[18px] sm:text-[24px] font-medium uppercase tracking-[3px] sm:tracking-[4px] text-[#000000] whitespace-nowrap shrink-0 select-none"
             >
               AAROHA
             </a>
           </div>
 
           {/* Right Zone: Search, Account, Cart */}
-          <div className="flex items-center justify-end gap-1 sm:gap-2.5">
+          <div className="flex items-center justify-end gap-0.5 sm:gap-2.5">
             <button
               type="button"
               onClick={onOpenSearch}
               aria-label="Search products"
-              className="p-2 text-[#000000] hover:text-[#d74a5d] transition-colors"
+              className="p-2 text-[#000000] hover:text-[#d74a5d] transition-colors min-w-[40px] min-h-[44px] flex items-center justify-center"
             >
               <Search className="w-[19px] h-[19px] stroke-[1.6]" />
             </button>
@@ -131,7 +134,7 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               onClick={onOpenAccount}
               aria-label="Account"
-              className="p-2 text-[#000000] hover:text-[#d74a5d] transition-colors"
+              className="p-2 text-[#000000] hover:text-[#d74a5d] transition-colors min-w-[40px] min-h-[44px] flex items-center justify-center"
             >
               <User className="w-[19px] h-[19px] stroke-[1.6]" />
             </button>
@@ -140,11 +143,11 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               onClick={onOpenCart}
               aria-label={`Shopping bag with ${cartCount} items`}
-              className="relative p-2 text-[#000000] hover:text-[#d74a5d] transition-colors"
+              className="relative p-2 text-[#000000] hover:text-[#d74a5d] transition-colors min-w-[40px] min-h-[44px] flex items-center justify-center"
             >
               <ShoppingBag className="w-[19px] h-[19px] stroke-[1.6]" />
               {cartCount > 0 && (
-                <span className="absolute top-1 right-0.5 min-w-[17px] h-[17px] px-1 bg-[#d74a5d] text-white text-[10px] font-semibold flex items-center justify-center tabular-nums leading-none">
+                <span className="absolute top-1.5 right-0.5 min-w-[17px] h-[17px] px-1 bg-[#d74a5d] text-white text-[10px] font-semibold flex items-center justify-center tabular-nums leading-none">
                   {cartCount}
                 </span>
               )}
@@ -161,8 +164,10 @@ export const Header: React.FC<HeaderProps> = ({
                   <SmartImage
                     src={activeMegaItem.megaImage}
                     alt={activeMegaItem.label}
+                    width={500}
+                    height={680}
+                    aspectRatio="3 / 4"
                     className="w-full h-full object-cover"
-                    fallbackLabel={activeMegaItem.label}
                   />
                 </div>
               )}
@@ -222,16 +227,16 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <div
             className="fixed inset-0 bg-black/40 transition-opacity"
-            onClick={() => setMobileDrawerOpen(false)}
+            onClick={() => onMobileDrawerOpenChange(false)}
           />
-          <div className="relative w-full max-w-[340px] bg-white h-full flex flex-col z-10 shadow-xl">
-            <div className="flex items-center justify-between px-5 h-16 border-b border-[#e8e8e8]">
+          <div className="relative w-full max-w-[340px] bg-white h-[100dvh] flex flex-col z-10 shadow-xl overflow-hidden">
+            <div className="shrink-0 flex items-center justify-between px-5 h-16 border-b border-[#e8e8e8]">
               <span className="text-[16px] font-medium uppercase tracking-[3px] text-[#000000]">
                 AAROHA
               </span>
               <button
                 type="button"
-                onClick={() => setMobileDrawerOpen(false)}
+                onClick={() => onMobileDrawerOpenChange(false)}
                 aria-label="Close navigation menu"
                 className="p-2 text-[#000000] hover:text-[#d74a5d]"
               >
@@ -239,11 +244,11 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 py-4 divide-y divide-[#e8e8e8]">
+            <div className="flex-1 min-h-0 overflow-y-auto px-5">
               <button
                 type="button"
                 onClick={() => handleNavClick('ALL')}
-                className="w-full py-3.5 text-left text-[13px] font-medium uppercase tracking-[1px] text-[#000000]"
+                className="w-full min-h-[56px] flex items-center text-left text-[13px] font-medium uppercase tracking-[1px] text-[#000000] border-b border-[#e8e8e8]"
               >
                 All Collections
               </button>
@@ -252,12 +257,12 @@ export const Header: React.FC<HeaderProps> = ({
                 const hasChildren = Boolean(item.columns?.length);
                 const isExpanded = expandedMobileGroup === item.label;
                 return (
-                  <div key={item.label} className="py-1">
-                    <div className="flex items-center justify-between">
+                  <div key={item.label} className="border-b border-[#e8e8e8]">
+                    <div className="min-h-[56px] flex items-center justify-between">
                       <button
                         type="button"
                         onClick={() => handleNavClick(item.filterKey)}
-                        className={`py-3 text-left text-[13px] font-medium uppercase tracking-[1px] flex-1 ${
+                        className={`min-h-[56px] flex items-center text-left text-[13px] font-medium uppercase tracking-[1px] flex-1 ${
                           item.isSale ? 'text-[#d74a5d]' : 'text-[#000000]'
                         }`}
                       >
@@ -270,7 +275,7 @@ export const Header: React.FC<HeaderProps> = ({
                             setExpandedMobileGroup(isExpanded ? null : item.label)
                           }
                           aria-label={`Toggle ${item.label} submenu`}
-                          className="p-2.5 text-[#343434]"
+                          className="w-11 h-[56px] flex items-center justify-end text-[#343434]"
                         >
                           <ChevronRight
                             className={`w-4 h-4 transition-transform duration-150 ${
@@ -302,14 +307,14 @@ export const Header: React.FC<HeaderProps> = ({
               })}
             </div>
 
-            <div className="p-5 bg-[#f2f2f2] border-t border-[#e8e8e8] space-y-3">
+            <div className="shrink-0 p-4 sm:p-5 bg-[#f2f2f2] border-t border-[#e8e8e8]">
               <button
                 type="button"
                 onClick={() => {
-                  setMobileDrawerOpen(false);
+                  onMobileDrawerOpenChange(false);
                   onOpenAccount();
                 }}
-                className="w-full py-2.5 px-4 bg-[#321004] text-white text-[11px] font-medium uppercase tracking-[1.2px] text-center"
+                className="w-full min-h-[44px] py-3 px-4 bg-[#321004] hover:bg-[#d74a5d] text-white text-[11px] font-medium uppercase tracking-[1.2px] text-center transition-colors cursor-pointer"
               >
                 Account &amp; Order Tracking
               </button>

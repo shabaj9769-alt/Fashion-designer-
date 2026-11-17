@@ -55,26 +55,29 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
+      className="aaroha-qv-backdrop fixed inset-0 z-50 flex"
       role="dialog"
       aria-modal="true"
       aria-label={product.title}
     >
       <div className="fixed inset-0 bg-black/55" onClick={onClose} />
 
-      <div className="relative z-10 w-full max-w-4xl bg-white border border-[#e8e8e8] shadow-2xl max-h-[92vh] overflow-y-auto grid grid-cols-1 md:grid-cols-2">
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close product quick view"
-          className="absolute top-3 right-3 z-20 w-9 h-9 bg-white/95 border border-[#e8e8e8] flex items-center justify-center text-[#000000] hover:text-[#d74a5d] cursor-pointer"
-        >
-          <X className="w-4 h-4" />
-        </button>
+      <div className="aaroha-qv-panel relative z-10 bg-white border border-[#e8e8e8] shadow-2xl">
+        {/* Sticky top-right close button spanning grid */}
+        <div className="sticky top-0 z-30 col-span-full h-0 flex justify-end pointer-events-none">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close product quick view"
+            className="pointer-events-auto mt-3 mr-3 w-11 h-11 bg-white/95 border border-[#e8e8e8] flex items-center justify-center text-[#000000] hover:text-[#d74a5d] shadow-sm cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
         {/* Left Image Column */}
         <div className="bg-[#f2f2f2] p-4 sm:p-5 flex flex-col gap-3">
-          <div className="relative aspect-[3/4] w-full overflow-hidden bg-white border border-[#e8e8e8]">
+          <div className="aaroha-qv-image-wrap relative overflow-hidden bg-white border border-[#e8e8e8]">
             {product.onSale && (
               <span className="absolute top-3 left-3 z-10 bg-[#d74a5d] text-white text-[10px] font-medium uppercase tracking-[1px] px-2.5 py-1 leading-none">
                 SALE
@@ -83,9 +86,10 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
             <SmartImage
               src={images[activeImageIdx]}
               alt={product.title}
+              width={600}
+              height={800}
               className="w-full h-full object-cover"
               fallbackBg={product.fallbackTone}
-              fallbackLabel={product.title}
             />
           </div>
 
@@ -95,7 +99,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => setActiveImageIdx(idx as 0 | 1)}
-                className={`aspect-[3/4] max-h-24 w-full overflow-hidden border transition-colors cursor-pointer ${
+                className={`aspect-[3/4] max-h-20 sm:max-h-24 w-full overflow-hidden border transition-colors cursor-pointer ${
                   activeImageIdx === idx
                     ? 'border-[#321004]'
                     : 'border-[#e8e8e8] opacity-70 hover:opacity-100'
@@ -104,6 +108,9 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                 <SmartImage
                   src={img}
                   alt={`${product.title} view ${idx + 1}`}
+                  width={600}
+                  height={800}
+                  aspectRatio="3 / 4"
                   className="w-full h-full object-cover"
                   fallbackBg={product.fallbackTone}
                 />
@@ -177,7 +184,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                       key={size}
                       type="button"
                       onClick={() => setSelectedSize(size)}
-                      className={`min-w-[44px] h-10 px-3 text-[12px] font-medium uppercase tracking-[0.8px] border transition-colors cursor-pointer ${
+                      className={`min-w-[44px] min-h-[44px] px-3 text-[12px] font-medium uppercase tracking-[0.8px] border transition-colors cursor-pointer ${
                         active
                           ? 'bg-[#321004] text-white border-[#321004]'
                           : 'bg-white text-[#000000] border-[#e8e8e8] hover:border-[#c8a078]'
@@ -203,7 +210,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                     value={customNote}
                     onChange={(e) => setCustomNote(e.target.value)}
                     placeholder="e.g. Bust 35in, Kurta length 44in, 3/4 sleeves"
-                    className="w-full px-3 py-2 border border-[#c8a078] text-[12px] text-[#000000] focus:outline-none"
+                    className="w-full min-h-[44px] px-3 py-2 border border-[#c8a078] text-[12px] text-[#000000] focus:outline-none"
                   />
                 </div>
               )}
@@ -217,7 +224,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                 aria-label="Decrease quantity"
-                className="w-10 h-11 flex items-center justify-center text-[#000000] hover:bg-[#f2f2f2] cursor-pointer"
+                className="w-11 min-h-[46px] flex items-center justify-center text-[#000000] hover:bg-[#f2f2f2] cursor-pointer"
               >
                 <Minus className="w-3.5 h-3.5" />
               </button>
@@ -228,7 +235,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                 type="button"
                 onClick={() => setQuantity((q) => Math.min(10, q + 1))}
                 aria-label="Increase quantity"
-                className="w-10 h-11 flex items-center justify-center text-[#000000] hover:bg-[#f2f2f2] cursor-pointer"
+                className="w-11 min-h-[46px] flex items-center justify-center text-[#000000] hover:bg-[#f2f2f2] cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
               </button>
@@ -237,7 +244,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
             <button
               type="button"
               onClick={handleAdd}
-              className="flex-1 h-11 bg-[#d74a5d] hover:bg-[#321004] text-white text-[12px] font-medium uppercase tracking-[1.5px] flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="flex-1 min-h-[46px] bg-[#d74a5d] hover:bg-[#321004] text-white text-[12px] font-medium uppercase tracking-[1.5px] flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               {addedFeedback ? (
                 <>
