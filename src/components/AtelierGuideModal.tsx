@@ -62,7 +62,7 @@ export const AtelierGuideModal: React.FC<AtelierGuideModalProps> = ({
             <>
               <p className="text-[13px] text-[#343434] leading-relaxed">
                 Select <strong className="font-medium text-[#000000]">Custom</strong>{' '}
-                in any product quick view to share bust, waist, hip, sleeve, or kurta
+                on any product page to share bust, waist, hip, sleeve, or kurta
                 length notes. Our pattern masters tailor your set to measure at zero extra cost.
               </p>
 
@@ -101,7 +101,7 @@ export const AtelierGuideModal: React.FC<AtelierGuideModalProps> = ({
                 {[
                   'Day 1–2: Hand-cut pure Chanderi, mulmul, or tussar fabric by our master cutter.',
                   'Day 3–6: Artisanal embroidery, French seams, and breathable cotton mulmul lining.',
-                  'Day 7–10: Final steam press, quality inspection, and complimentary worldwide dispatch.',
+                  'Day 7–10: Final steam press, quality inspection, and complimentary dispatch across India.',
                 ].map((step) => (
                   <li
                     key={step}

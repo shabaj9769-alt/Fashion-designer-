@@ -5,7 +5,7 @@ const FEATURES = [
   {
     icon: Globe,
     title: 'Free Shipping',
-    subtitle: 'Complimentary worldwide delivery',
+    subtitle: 'Complimentary delivery across India',
   },
   {
     icon: Scissors,

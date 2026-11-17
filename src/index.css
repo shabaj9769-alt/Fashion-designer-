@@ -178,55 +178,56 @@
   }
 }
 
-/* Quick View Modal: centered dialog desktop, full-width bottom sheet mobile */
-.aaroha-qv-backdrop {
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
+/* Size validation shake animation */
+@keyframes aaroha-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
 }
 
-.aaroha-qv-panel {
-  width: 100%;
-  max-width: 896px;
-  max-height: 90dvh;
-  overflow-y: auto;
+.aaroha-shake {
+  animation: aaroha-shake 0.42s ease-in-out;
+}
+
+/* Checkout 2-col on true desktop, stacked on mobile/tablet/Desktop-site touch mode */
+.aaroha-checkout-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.9fr);
+  gap: 32px;
+  align-items: start;
 }
 
-.aaroha-qv-image-wrap {
-  aspect-ratio: 3 / 4;
-  width: 100%;
-}
-
-@media (max-width: 768px), (hover: none) and (pointer: coarse) {
-  .aaroha-qv-backdrop {
-    align-items: flex-end;
-    justify-content: center;
-    padding: 0;
-  }
-  .aaroha-qv-panel {
-    max-width: 100vw;
-    width: 100%;
-    max-height: 90dvh;
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+  .aaroha-checkout-grid {
     grid-template-columns: 1fr;
-  }
-  .aaroha-qv-image-wrap {
-    max-height: 45dvh;
-    aspect-ratio: auto;
-    height: 45dvh;
+    gap: 24px;
   }
 }
 
-/* Hover second image only on true desktop hover pointers */
-.aaroha-hover-img {
-  display: none;
+/* Subtle 200ms page view transition */
+@keyframes aaroha-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .aaroha-hover-img {
-    display: block;
-  }
+.aaroha-page-enter {
+  animation: aaroha-page-enter 200ms ease-out;
+}
+
+/* Sticky page topbar with safe-area support */
+.aaroha-sticky-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 .no-scrollbar::-webkit-scrollbar {

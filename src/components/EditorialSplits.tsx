@@ -21,7 +21,7 @@ export const EditorialSplits: React.FC<EditorialSplitsProps> = ({
               width={900}
               height={700}
               className="w-full h-full object-cover"
-              fallbackBg="linear-gradient(145deg, #ece5dc 0%, #ddd2c4 100%)"
+              fallbackBg="linear-gradient(135deg, #f2f2f2, #e8e8e8)"
             />
           </div>
 
@@ -81,7 +81,7 @@ export const EditorialSplits: React.FC<EditorialSplitsProps> = ({
               width={900}
               height={700}
               className="w-full h-full object-cover"
-              fallbackBg="linear-gradient(145deg, #e8dfd6 0%, #d8cbbd 100%)"
+              fallbackBg="linear-gradient(135deg, #f2f2f2, #e8e8e8)"
             />
           </div>
         </div>

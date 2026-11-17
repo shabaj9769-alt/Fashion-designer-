@@ -34,16 +34,15 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
       aria-roledescription="carousel"
       aria-label="Featured seasonal campaigns"
     >
-      {/* Image Layer: z-index 0 */}
+      {/* Background Gradient / Optional Image Layer: z-index 0 */}
       <div className="absolute inset-0 z-0">
-        <div className="hidden sm:block w-full h-full">
+        <div className="hidden sm:block w-full h-full aspect-[16/9]">
           <SmartImage
             key={`${activeSlide.id}-desktop`}
             src={activeSlide.desktopImage}
             alt={activeSlide.title}
             width={1600}
             height={900}
-            loading="eager"
             className="w-full h-full object-cover"
             fallbackBg={activeSlide.fallbackBg}
           />
@@ -55,7 +54,6 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
             alt={activeSlide.title}
             width={800}
             height={1067}
-            loading="eager"
             className="w-full h-full object-cover"
             fallbackBg={activeSlide.fallbackBg}
           />

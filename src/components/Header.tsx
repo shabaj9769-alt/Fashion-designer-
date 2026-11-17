@@ -17,6 +17,7 @@ interface HeaderProps {
   mobileDrawerOpen: boolean;
   onMobileDrawerOpenChange: (open: boolean) => void;
   onSelectFilter: (filterKey: string) => void;
+  onGoHome?: () => void;
   onOpenCart: () => void;
   onOpenSearch: () => void;
   onOpenAccount: () => void;
@@ -28,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
   mobileDrawerOpen,
   onMobileDrawerOpenChange,
   onSelectFilter,
+  onGoHome,
   onOpenCart,
   onOpenSearch,
   onOpenAccount,
@@ -40,7 +42,6 @@ export const Header: React.FC<HeaderProps> = ({
   const handleNavClick = (filterKey: string) => {
     onSelectFilter(filterKey);
     setHoveredMenu(null);
-    onMobileDrawerOpenChange(false);
   };
 
   const activeMegaItem = NAV_ITEMS.find(
@@ -50,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       <header
-        className="sticky top-0 z-40 bg-white border-b border-[#e8e8e8]"
+        className="aaroha-sticky-topbar bg-white border-b border-[#e8e8e8]"
         onMouseLeave={() => setHoveredMenu(null)}
       >
         <div className="max-w-[1440px] mx-auto px-4 lg:px-8 h-16 lg:h-[72px] grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
@@ -107,11 +108,15 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Center Zone: Brand Logo */}
           <div className="flex items-center justify-center">
             <a
-              href="#top"
+              href="#/"
               onClick={(e) => {
                 e.preventDefault();
-                onSelectFilter('ALL');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (onGoHome) {
+                  onGoHome();
+                } else {
+                  onSelectFilter('ALL');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
               }}
               className="text-[18px] sm:text-[24px] font-medium uppercase tracking-[3px] sm:tracking-[4px] text-[#000000] whitespace-nowrap shrink-0 select-none"
             >
@@ -159,7 +164,7 @@ export const Header: React.FC<HeaderProps> = ({
         {activeMegaItem && (
           <div className="hidden lg:block absolute left-0 right-0 top-full bg-white border-b border-[#e8e8e8] shadow-lg z-40">
             <div className="max-w-[1440px] mx-auto px-8 py-8 grid grid-cols-[240px_1fr] gap-10 items-start">
-              {activeMegaItem.megaImage && (
+              {activeMegaItem.megaImage !== undefined && (
                 <div className="aspect-[3/4] w-full overflow-hidden bg-[#f2f2f2] border border-[#e8e8e8]">
                   <SmartImage
                     src={activeMegaItem.megaImage}
@@ -168,6 +173,7 @@ export const Header: React.FC<HeaderProps> = ({
                     height={680}
                     aspectRatio="3 / 4"
                     className="w-full h-full object-cover"
+                    fallbackBg="linear-gradient(135deg, #f2f2f2, #e8e8e8)"
                   />
                 </div>
               )}
@@ -220,7 +226,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Mobile Navigation Drawer */}
       {mobileDrawerOpen && (
         <div
-          className="fixed inset-0 z-50 lg:hidden flex"
+          className="fixed inset-0 z-50 flex"
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation"
@@ -310,10 +316,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="shrink-0 p-4 sm:p-5 bg-[#f2f2f2] border-t border-[#e8e8e8]">
               <button
                 type="button"
-                onClick={() => {
-                  onMobileDrawerOpenChange(false);
-                  onOpenAccount();
-                }}
+                onClick={onOpenAccount}
                 className="w-full min-h-[44px] py-3 px-4 bg-[#321004] hover:bg-[#d74a5d] text-white text-[11px] font-medium uppercase tracking-[1.2px] text-center transition-colors cursor-pointer"
               >
                 Account &amp; Order Tracking

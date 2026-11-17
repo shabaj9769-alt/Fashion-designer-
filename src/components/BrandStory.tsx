@@ -15,7 +15,7 @@ export const BrandStory: React.FC = () => {
           creates thoughtful ethnic silhouettes in breathable Chanderi, hand-spun mulmul,
           and tussar silk. Every piece is cut to order rather than mass-warehoused,
           honoring textile artisans while giving you an effortless fit delivered straight
-          to your doorstep worldwide.
+          to your doorstep across India.
         </p>
       </div>
     </section>

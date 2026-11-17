@@ -17,7 +17,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({
         </h2>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-          {FEATURED_CATEGORIES.map((cat, idx) => (
+          {FEATURED_CATEGORIES.map((cat) => (
             <button
               key={cat.id}
               type="button"
@@ -31,8 +31,7 @@ export const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({
                   width={600}
                   height={800}
                   aspectRatio="3 / 4"
-                  loading={idx < 3 ? 'eager' : 'lazy'}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  className="w-full h-full object-cover"
                   fallbackBg={cat.fallbackTone}
                 />
               </div>

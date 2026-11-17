@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
-import { ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Product, SortOption } from '../types/store';
+import { formatINR, getDiscountPercent } from '../utils/currency';
 import { SmartImage } from './SmartImage';
 
 interface RecommendedProductsProps {
@@ -9,7 +10,7 @@ interface RecommendedProductsProps {
   sortBy: SortOption;
   onSelectFilter: (filterKey: string) => void;
   onChangeSort: (sort: SortOption) => void;
-  onOpenQuickView: (product: Product) => void;
+  onOpenProduct: (product: Product) => void;
 }
 
 const FILTER_TABS = [
@@ -26,7 +27,7 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
   sortBy,
   onSelectFilter,
   onChangeSort,
-  onOpenQuickView,
+  onOpenProduct,
 }) => {
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -147,39 +148,35 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
 
           {/* Responsive: 2-Col Grid on Mobile/Touch, Horizontal Slider on Desktop */}
           <div ref={trackRef} className="aaroha-products-track no-scrollbar">
-            {products.map((product) => (
-              <article
-                key={product.id}
-                className="aaroha-product-card group flex flex-col bg-white border border-[#e8e8e8]"
-              >
-                <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#f2f2f2]">
-                  {product.onSale && (
-                    <span className="absolute top-2.5 left-2.5 z-20 bg-[#d74a5d] text-white text-[10px] font-medium uppercase tracking-[1px] px-2 py-1 leading-none">
-                      SALE
-                    </span>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => onOpenQuickView(product)}
-                    className="block w-full h-full text-left cursor-pointer"
-                    aria-label={`Quick view ${product.title}`}
+            {products.map((product) => {
+              const discountPct = getDiscountPercent(
+                product.price,
+                product.salePrice
+              );
+              return (
+                <article
+                  key={product.id}
+                  className="aaroha-product-card group flex flex-col bg-white border border-[#e8e8e8]"
+                >
+                  <a
+                    href={`#/product/${product.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onOpenProduct(product);
+                    }}
+                    className="flex flex-col flex-1 text-left cursor-pointer"
+                    aria-label={`View ${product.title}`}
                   >
-                    {/* Primary Image */}
-                    <SmartImage
-                      src={product.primaryImage}
-                      alt={product.title}
-                      width={600}
-                      height={800}
-                      aspectRatio="3 / 4"
-                      className="w-full h-full object-cover transition-opacity duration-300 [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-0"
-                      fallbackBg={product.fallbackTone}
-                    />
-                    {/* Secondary Hover Image (desktop hover:hover only) */}
-                    <div className="aaroha-hover-img absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#f2f2f2]">
+                      {product.onSale && discountPct > 0 && (
+                        <span className="absolute top-2.5 left-2.5 z-20 bg-[#d74a5d] text-white text-[10px] font-medium uppercase tracking-[1px] px-2 py-1 leading-none">
+                          SALE
+                        </span>
+                      )}
+
                       <SmartImage
-                        src={product.secondaryImage}
-                        alt={`${product.title} alternate view`}
+                        src={product.primaryImage}
+                        alt={product.title}
                         width={600}
                         height={800}
                         aspectRatio="3 / 4"
@@ -187,58 +184,43 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
                         fallbackBg={product.fallbackTone}
                       />
                     </div>
-                  </button>
 
-                  {/* Quick View Desktop Overlay Button */}
-                  <div className="hidden lg:flex absolute inset-x-3 bottom-3 z-20 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
-                    <button
-                      type="button"
-                      onClick={() => onOpenQuickView(product)}
-                      className="w-full min-h-[44px] py-2.5 bg-white/95 hover:bg-[#d74a5d] text-[#000000] hover:text-white border border-[#e8e8e8] hover:border-[#d74a5d] text-[11px] font-medium uppercase tracking-[1px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>Quick View</span>
-                    </button>
-                  </div>
-                </div>
+                    <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between min-w-0">
+                      <div className="min-w-0">
+                        <p className="text-[10px] uppercase tracking-[1px] text-[#c8a078] font-medium mb-1">
+                          {product.category}
+                        </p>
+                        <h3 className="text-[14px] font-medium text-[#000000] group-hover:text-[#d74a5d] transition-colors leading-[1.4] whitespace-normal [overflow-wrap:anywhere] min-h-[2.8em] normal-case tracking-normal">
+                          {product.title}
+                        </h3>
+                      </div>
 
-                <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between min-w-0">
-                  <div className="min-w-0">
-                    <p className="text-[10px] uppercase tracking-[1px] text-[#c8a078] font-medium mb-1">
-                      {product.category}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => onOpenQuickView(product)}
-                      className="w-full text-left text-[14px] font-medium text-[#000000] hover:text-[#d74a5d] transition-colors leading-[1.4] whitespace-normal [overflow-wrap:anywhere] min-h-[2.8em] cursor-pointer"
-                    >
-                      {product.title}
-                    </button>
-                  </div>
+                      <div className="mt-2.5 flex flex-col min-w-0">
+                        <div className="flex flex-wrap items-baseline gap-[6px] sm:gap-[8px] tabular-nums">
+                          <span className="text-[15px] sm:text-[16px] font-semibold text-[#000000]">
+                            {formatINR(product.salePrice)}
+                          </span>
+                          {product.onSale && product.price > product.salePrice && (
+                            <>
+                              <span className="text-[12px] sm:text-[13px] text-[#777777] line-through">
+                                {formatINR(product.price)}
+                              </span>
+                              <span className="text-[11px] font-semibold text-[#15803d]">
+                                {discountPct}% OFF
+                              </span>
+                            </>
+                          )}
+                        </div>
 
-                  <div className="mt-2.5 flex flex-col min-w-0">
-                    <div className="flex flex-wrap items-baseline gap-[8px] tabular-nums">
-                      {product.onSale && (
-                        <span className="text-[13px] text-[#777777] line-through">
-                          ${product.regularPrice.toFixed(2)}
+                        <span className="w-full mt-[10px] min-h-[44px] px-2 border border-[#c8a078] text-[#321004] group-hover:bg-[#321004] group-hover:border-[#321004] group-hover:text-white text-[11px] font-medium uppercase tracking-[1px] whitespace-nowrap transition-colors flex items-center justify-center">
+                          SELECT SIZE
                         </span>
-                      )}
-                      <span className="text-[15px] sm:text-[16px] font-semibold text-[#d74a5d]">
-                        ${product.salePrice.toFixed(2)}
-                      </span>
+                      </div>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => onOpenQuickView(product)}
-                      className="w-full mt-[10px] min-h-[44px] px-2 border border-[#c8a078] text-[#321004] hover:bg-[#321004] hover:border-[#321004] hover:text-white text-[11px] font-medium uppercase tracking-[1px] whitespace-nowrap transition-colors cursor-pointer flex items-center justify-center"
-                    >
-                      SELECT SIZE
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
+                  </a>
+                </article>
+              );
+            })}
           </div>
         </div>
       </div>

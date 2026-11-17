@@ -18,14 +18,15 @@ export const CollectionBanners: React.FC<CollectionBannersProps> = ({
               key={banner.id}
               className="group relative min-h-[420px] sm:min-h-[480px] lg:min-h-[540px] flex flex-col justify-end overflow-hidden bg-[#321004]"
             >
-              {/* Background Image Layer: z-index 0 */}
-              <div className="absolute inset-0 z-0 bg-[#f2f2f2]">
+              {/* Background Gradient / Optional Image Layer: z-index 0 */}
+              <div className="absolute inset-0 z-0 bg-[#321004]">
                 <SmartImage
                   src={banner.image}
                   alt={banner.title}
                   width={1200}
                   height={800}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  aspectRatio="3 / 2"
+                  className="w-full h-full object-cover"
                   fallbackBg={banner.fallbackBg}
                 />
               </div>

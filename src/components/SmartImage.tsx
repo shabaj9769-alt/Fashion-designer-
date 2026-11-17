@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 interface SmartImageProps {
   src: string;
@@ -7,35 +7,12 @@ interface SmartImageProps {
   width?: number;
   height?: number;
   aspectRatio?: string;
-  loading?: 'lazy' | 'eager';
   fallbackBg?: string;
-  fallbackLabel?: string;
-  lightText?: boolean;
 }
 
 /**
- * Generates an alternate lock URL if the primary LoremFlickr URL fails to load.
- */
-function buildAlternateLockUrl(originalUrl: string): string | null {
-  try {
-    const url = new URL(originalUrl);
-    const currentLock = url.searchParams.get('lock');
-    if (currentLock) {
-      const nextLock = Number(currentLock) + 500;
-      url.searchParams.set('lock', String(Number.isFinite(nextLock) ? nextLock : 999));
-      return url.toString();
-    }
-    url.searchParams.set('lock', '777');
-    return url.toString();
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Renders a responsive cover image with width/height attributes, configurable loading,
- * aspect-ratio, one automatic alternate-lock retry on error, and a plain
- * soft-gradient fallback (#f2f2f2 to #e8e8e8) with zero text.
+ * Renders <img> only when a non-empty URL is provided in IMAGES.
+ * Otherwise renders a clean plain color/gradient block with no text, icons, or error fallback logic.
  */
 export const SmartImage: React.FC<SmartImageProps> = ({
   src,
@@ -44,36 +21,14 @@ export const SmartImage: React.FC<SmartImageProps> = ({
   width = 600,
   height = 800,
   aspectRatio,
-  loading = 'lazy',
-  fallbackBg = 'linear-gradient(145deg, #f2f2f2 0%, #e8e8e8 100%)',
+  fallbackBg = 'linear-gradient(135deg, #f2f2f2, #e8e8e8)',
 }) => {
-  const [currentSrc, setCurrentSrc] = useState(src);
-  const [retried, setRetried] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const cleanSrc = src ? src.trim() : '';
 
-  useEffect(() => {
-    setCurrentSrc(src);
-    setRetried(false);
-    setFailed(false);
-  }, [src]);
-
-  const handleError = () => {
-    if (!retried && currentSrc) {
-      const altUrl = buildAlternateLockUrl(currentSrc);
-      if (altUrl && altUrl !== currentSrc) {
-        setRetried(true);
-        setCurrentSrc(altUrl);
-        return;
-      }
-    }
-    setFailed(true);
-  };
-
-  if (failed || !currentSrc) {
+  if (!cleanSrc) {
     return (
       <div
-        role="img"
-        aria-label={alt}
+        aria-hidden="true"
         className={`w-full h-full ${className}`}
         style={{
           background: fallbackBg,
@@ -85,13 +40,10 @@ export const SmartImage: React.FC<SmartImageProps> = ({
 
   return (
     <img
-      src={currentSrc}
+      src={cleanSrc}
       alt={alt}
       width={width}
       height={height}
-      loading={loading}
-      referrerPolicy="no-referrer"
-      onError={handleError}
       className={`w-full h-full object-cover ${className}`}
       style={aspectRatio ? { aspectRatio } : undefined}
     />

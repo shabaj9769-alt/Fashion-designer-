@@ -6,7 +6,7 @@ export interface Product {
   category: 'Suit Sets' | 'Kurtas' | 'Co-ord Sets' | 'Kids';
   subCategory: string;
   collectionTags: string[];
-  regularPrice: number;
+  price: number;
   salePrice: number;
   onSale: boolean;
   primaryImage: string;
@@ -24,6 +24,31 @@ export interface CartItem {
   size: SizeOption;
   quantity: number;
   customNote?: string;
+}
+
+export type PaymentMethodId = 'upi' | 'card' | 'netbanking' | 'cod';
+
+export interface DeliveryAddress {
+  fullName: string;
+  mobile: string;
+  email: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string;
+  pincode: string;
+}
+
+export interface PlacedOrder {
+  orderId: string;
+  placedAt: string;
+  estimatedDelivery: string;
+  items: CartItem[];
+  address: DeliveryAddress;
+  paymentMethodLabel: string;
+  subtotal: number;
+  discountAmount: number;
+  totalPaid: number;
 }
 
 export interface HeroSlide {

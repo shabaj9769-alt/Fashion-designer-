@@ -3,10 +3,12 @@ import { MessageCircle } from 'lucide-react';
 
 interface WhatsAppButtonProps {
   hidden?: boolean;
+  aboveStickyBar?: boolean;
 }
 
 export const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   hidden = false,
+  aboveStickyBar = false,
 }) => {
   return (
     <a
@@ -17,9 +19,12 @@ export const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
       title="Chat with Aaroha Stylist"
       aria-hidden={hidden}
       tabIndex={hidden ? -1 : undefined}
+      style={aboveStickyBar ? { bottom: '100px' } : undefined}
       className={`${
         hidden ? 'hidden' : 'flex'
-      } fixed bottom-4 right-4 z-50 w-12 h-12 bg-[#25D366] hover:bg-[#1fb858] text-white shadow-md items-center justify-center rounded-full transition-transform duration-150 hover:scale-105`}
+      } fixed ${
+        aboveStickyBar ? '' : 'bottom-4'
+      } right-4 z-50 w-12 h-12 bg-[#25D366] hover:bg-[#1fb858] text-white shadow-md items-center justify-center rounded-full transition-transform duration-150 hover:scale-105`}
     >
       <MessageCircle className="w-6 h-6 fill-white stroke-[#25D366]" />
     </a>

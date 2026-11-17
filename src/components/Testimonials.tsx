@@ -42,19 +42,17 @@ export const Testimonials: React.FC = () => {
               </div>
 
               <div className="pt-4 border-t border-[#e8e8e8] flex items-center gap-3">
-                {item.avatar && (
-                  <div className="w-10 h-10 shrink-0 rounded-full overflow-hidden border border-[#e8e8e8] bg-[#f2f2f2]">
-                    <SmartImage
-                      src={item.avatar}
-                      alt={item.name}
-                      width={200}
-                      height={200}
-                      aspectRatio="1 / 1"
-                      className="w-full h-full object-cover"
-                      fallbackBg="linear-gradient(145deg, #f2ebe4 0%, #e4d8cc 100%)"
-                    />
-                  </div>
-                )}
+                <div className="w-10 h-10 shrink-0 rounded-full overflow-hidden border border-[#e8e8e8] bg-[#f2f2f2]">
+                  <SmartImage
+                    src={item.avatar ?? ''}
+                    alt={item.name}
+                    width={200}
+                    height={200}
+                    aspectRatio="1 / 1"
+                    className="w-full h-full object-cover"
+                    fallbackBg="linear-gradient(135deg, #f2f2f2, #e8e8e8)"
+                  />
+                </div>
                 <div className="min-w-0">
                   <p className="text-[12px] font-medium uppercase tracking-[1px] text-[#000000]">
                     {item.name}
