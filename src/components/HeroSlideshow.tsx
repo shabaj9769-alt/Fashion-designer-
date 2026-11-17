@@ -7,6 +7,14 @@ interface HeroSlideshowProps {
   onExploreFilter: (filterKey: string) => void;
 }
 
+const HERO_FALLBACK_BG = [
+  'repeating-linear-gradient(45deg, rgba(220, 180, 140, 0.055) 0px, rgba(220, 180, 140, 0.055) 1px, transparent 1px, transparent 16px)',
+  'repeating-linear-gradient(-45deg, rgba(200, 160, 120, 0.04) 0px, rgba(200, 160, 120, 0.04) 1px, transparent 1px, transparent 16px)',
+  'radial-gradient(ellipse 80% 65% at 75% 22%, rgba(200, 160, 120, 0.24) 0%, rgba(90, 42, 20, 0.18) 45%, transparent 75%)',
+  'radial-gradient(circle at 18% 35%, rgba(138, 66, 32, 0.32) 0%, transparent 55%)',
+  'linear-gradient(135deg, #321004 0%, #461c0b 45%, #5a2a14 100%)',
+].join(', ');
+
 export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
   onExploreFilter,
 }) => {
@@ -40,7 +48,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
 
   return (
     <section
-      className="relative w-full overflow-hidden bg-[#321004] min-h-[480px] sm:min-h-[540px] lg:min-h-[620px] flex flex-col justify-end"
+      className="relative w-full overflow-hidden bg-[#321004] min-h-[400px] sm:min-h-[540px] lg:min-h-[620px] flex flex-col justify-end"
       aria-roledescription="carousel"
       aria-label="Featured seasonal campaigns"
     >
@@ -54,7 +62,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
             width={1600}
             height={900}
             className="w-full h-full object-cover"
-            fallbackBg={activeSlide.fallbackBg}
+            fallbackBg={HERO_FALLBACK_BG}
           />
         </div>
         <div className="block sm:hidden w-full h-full">
@@ -65,7 +73,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
             width={800}
             height={1067}
             className="w-full h-full object-cover"
-            fallbackBg={activeSlide.fallbackBg}
+            fallbackBg={HERO_FALLBACK_BG}
           />
         </div>
       </div>
@@ -102,22 +110,22 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
       )}
 
       {/* Single Normal-Flow Text & Controls Container: z-index 2, bottom padding 24px */}
-      <div className="relative z-[2] w-full max-w-[1440px] mx-auto px-5 sm:px-10 lg:px-14 pt-20 pb-[24px] flex flex-col gap-6">
+      <div className="relative z-[2] w-full max-w-[1440px] mx-auto px-5 sm:px-10 lg:px-14 pt-10 sm:pt-20 pb-[24px] flex flex-col gap-4 sm:gap-6">
         <div className="max-w-xl text-white flex flex-col items-start gap-3">
-          <p className="text-[11px] font-medium uppercase tracking-[2px] text-[#dcb48c]">
+          <p className="text-[11px] font-medium uppercase tracking-[1.5px] sm:tracking-[2px] text-[#dcb48c]">
             {activeSlide.eyebrow}
           </p>
           <h1 className="aaroha-hero-heading font-normal uppercase text-white">
             {activeSlide.title}
           </h1>
-          <p className="text-[13px] sm:text-[15px] text-white/90 leading-relaxed max-w-md">
+          <p className="text-[13px] sm:text-[15px] line-clamp-2 sm:line-clamp-none text-white/90 leading-relaxed max-w-md">
             {activeSlide.subtitle}
           </p>
           <div className="pt-2">
             <button
               type="button"
               onClick={() => onExploreFilter(activeSlide.filterKey)}
-              className="inline-flex items-center justify-center min-h-[46px] px-7 py-3 bg-[#d74a5d] hover:bg-[#b8384a] text-white text-[12px] font-medium uppercase tracking-[1.5px] transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center min-h-[42px] sm:min-h-[46px] px-6 sm:px-7 py-2.5 sm:py-3 bg-[#d74a5d] hover:bg-[#b8384a] text-white text-[12px] font-medium uppercase tracking-[1.5px] transition-colors cursor-pointer"
             >
               {activeSlide.ctaLabel}
             </button>
@@ -148,7 +156,7 @@ export const HeroSlideshow: React.FC<HeroSlideshowProps> = ({
               type="button"
               onClick={() => setIsPlaying((p) => !p)}
               aria-label={isPlaying ? 'Pause slideshow' : 'Play slideshow'}
-              className="w-11 h-11 bg-black/45 hover:bg-black/70 text-white border border-white/30 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-10 h-10 sm:w-11 sm:h-11 bg-black/45 hover:bg-black/70 text-white border border-white/30 flex items-center justify-center transition-colors cursor-pointer"
             >
               {isPlaying ? (
                 <Pause className="w-3.5 h-3.5" />
